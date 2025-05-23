@@ -2,172 +2,326 @@
 <html lang="da">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mål Liste</title>
+  <title>Mine mål</title>
   <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #202020;
+      --item-bg: #f0f0f0;
+      --checkbox-border: #888;
+      --checkbox-check: green;
+      --delete-color: red;
+      --button-bg: #008000;
+      --button-text: white;
+    }
+
+    body.dark {
+      --bg-color: #121212;
+      --text-color: #e0e0e0;
+      --item-bg: #1f1f1f;
+      --checkbox-border: #aaa;
+      --checkbox-check: #00ff00;
+      --delete-color: #ff5555;
+      --button-bg: #005500;
+      --button-text: #ddffdd;
+    }
+
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      background-color: white;
-      color: black;
-      font-weight: bold;
+      background: var(--bg-color);
+      color: var(--text-color);
+      padding: 30px;
+      transition: background 0.3s, color 0.3s;
     }
 
-    .dark-mode {
-      background-color: #1e1e1e;
-      color: white;
-    }
-
-    header {
+    .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px;
+      margin-bottom: 25px;
     }
 
-    h1 {
-      font-weight: bold;
+    h2 {
+      font-size: 44px;
+      font-weight: 900;
+      margin: 0;
     }
 
-    .theme-toggle {
-      cursor: pointer;
-      padding: 8px 14px;
-      font-weight: bold;
-      border: 2px solid currentColor;
+    .toggle-theme {
       background: none;
-      border-radius: 6px;
-    }
-
-    form {
-      display: flex;
-      justify-content: center;
-      margin: 20px;
-    }
-
-    input {
-      padding: 10px;
-      font-size: 16px;
-      font-weight: bold;
-    }
-
-    button[type="submit"] {
-      padding: 10px 16px;
-      margin-left: 10px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      font-weight: bold;
+      border: 2px solid var(--text-color);
+      color: var(--text-color);
+      font-size: 18px;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 8px;
       cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .toggle-theme:hover {
+      background: var(--text-color);
+      color: var(--bg-color);
+    }
+
+    .input-area {
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      max-width: 700px;
+    }
+
+    input[type="text"] {
+      padding: 14px;
+      font-size: 24px;
+      font-weight: 700;
+      flex-grow: 1;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--button-bg);
+    }
+
+    button {
+      padding: 14px 28px;
+      font-size: 24px;
+      font-weight: 700;
+      background-color: var(--button-bg);
+      color: var(--button-text);
+      border: none;
+      border-radius: 8px;
+      margin-left: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      flex-shrink: 0;
+      min-width: 140px;
+    }
+
+    button:hover {
+      background-color: #005500cc;
     }
 
     ul {
       list-style-type: none;
-      padding: 0;
-      margin: 0 auto;
-      max-width: 600px;
+      padding-left: 0;
+      margin-bottom: 30px;
     }
 
     li {
+      margin: 18px 0;
+      font-size: 24px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      background-color: #f2f2f2;
-      padding: 12px;
-      margin: 10px 20px;
+      justify-content: space-between;
+      background: var(--item-bg);
+      border-radius: 8px;
+      padding: 14px 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: background 0.3s;
+    }
+
+    .item-left {
+      display: flex;
+      align-items: center;
+      flex-grow: 1;
+      gap: 16px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkbox {
+      width: 28px;
+      height: 28px;
+      border: 2.5px solid var(--checkbox-border);
       border-radius: 6px;
-      font-weight: bold;
+      position: relative;
+      transition: border-color 0.3s;
+      flex-shrink: 0;
+    }
+
+    .done .checkbox {
+      border-color: var(--checkbox-check);
+      background-color: var(--checkbox-check);
+    }
+
+    .done .checkbox::after {
+      content: "✔";
+      position: absolute;
+      top: 1px;
+      left: 6px;
+      color: white;
+      font-size: 22px;
+      font-weight: 900;
+      animation: checkFade 0.4s ease forwards;
+    }
+
+    @keyframes checkFade {
+      from {opacity: 0; transform: scale(0.7) rotate(-45deg);}
+      to {opacity: 1; transform: scale(1) rotate(0deg);}
+    }
+
+    .done .item-text {
+      color: var(--checkbox-check);
+      text-decoration: line-through;
+    }
+
+    .item-text {
+      flex-grow: 1;
+      font-weight: 700;
+      color: var(--text-color);
+      transition: color 0.3s;
     }
 
     .date {
-      margin-left: auto;
-      padding-left: 20px;
-      font-size: 14px;
+      font-size: 18px;
+      color: #666;
+      font-weight: 700;
       white-space: nowrap;
-      font-weight: bold;
+      user-select: none;
     }
 
-    .delete-btn {
-      background: none;
-      border: none;
-      color: #dc3545;
+    .delete {
+      color: var(--delete-color);
+      font-size: 28px;
       cursor: pointer;
-      padding-left: 20px;
-      font-weight: bold;
+      margin-left: 24px;
+      user-select: none;
+      transition: color 0.3s;
     }
 
-    .delete-btn svg {
-      width: 20px;
-      height: 20px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2.5;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+    .delete:hover {
+      color: #ff0000cc;
+    }
+
+    .stats {
+      font-size: 22px;
+      font-weight: 800;
+      user-select: none;
+      border-top: 2px solid var(--text-color);
+      padding-top: 15px;
+      max-width: 400px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Mål Liste</h1>
-    <button class="theme-toggle">Tema</button>
-  </header>
+  <div class="top-bar">
+    <h2>Mine mål</h2>
+    <button class="toggle-theme" onclick="toggleTheme()">Skift tema</button>
+  </div>
 
-  <form id="form">
-    <input type="text" id="input" placeholder="Indtast nyt mål..." required />
-    <button type="submit">Tilføj</button>
-  </form>
+  <div class="input-area">
+    <input type="text" id="newItem" placeholder="Skriv et nyt mål..." />
+    <button onclick="addItem()">Tilføj</button>
+  </div>
 
   <ul id="list"></ul>
 
+  <div class="stats" id="stats"></div>
+
   <script>
-    const themeBtn = document.querySelector(".theme-toggle");
-    const body = document.body;
-    themeBtn.onclick = () => {
-      body.classList.toggle("dark-mode");
-    };
+    function formatDate() {
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      let dateStr = new Date().toLocaleDateString('da-DK', options);
+      return dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+    }
 
-    const form = document.getElementById("form");
-    const input = document.getElementById("input");
-    const list = document.getElementById("list");
-
-    form.onsubmit = e => {
-      e.preventDefault();
-      const text = input.value.trim();
-      if (!text) return;
-
-      const li = document.createElement("li");
-
-      const span = document.createElement("span");
-      span.textContent = text;
-
-      const date = document.createElement("span");
-      date.className = "date";
-      const now = new Date();
-      date.textContent = now.toLocaleDateString("da-DK", {
-        year: "numeric",
-        month: "long",
-        day: "numeric"
+    function saveList() {
+      const items = [];
+      document.querySelectorAll("#list li").forEach(li => {
+        items.push({
+          text: li.querySelector(".item-text").textContent,
+          date: li.querySelector(".date").textContent,
+          done: li.classList.contains("done")
+        });
       });
+      localStorage.setItem("goalList", JSON.stringify(items));
+    }
 
-      const delBtn = document.createElement("button");
-      delBtn.className = "delete-btn";
-      delBtn.innerHTML = `
-        <svg viewBox="0 0 24 24">
-          <polyline points="3 6 5 6 21 6"></polyline>
-          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
-          <path d="M10 11v6"></path>
-          <path d="M14 11v6"></path>
-          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
-        </svg>
-      `;
-      delBtn.onclick = () => li.remove();
+    function loadList() {
+      const saved = localStorage.getItem("goalList");
+      if (saved) {
+        const items = JSON.parse(saved);
+        items.sort((a,b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return dateA - dateB;
+        });
+        items.forEach(item => addItemToList(item.text, item.date, item.done));
+      }
+    }
 
-      li.appendChild(span);
-      li.appendChild(date);
-      li.appendChild(delBtn);
-      list.appendChild(li);
+    function toggleItem(li) {
+      li.classList.toggle("done");
+      saveList();
+      updateStats();
+    }
+
+    function deleteItem(el) {
+      el.parentElement.remove();
+      saveList();
+      updateStats();
+    }
+
+    function addItem() {
+      const input = document.getElementById("newItem");
+      const text = input.value.trim();
+      if (text === "") return;
+      const date = formatDate();
+      addItemToList(text, date, false);
       input.value = "";
-    };
+      saveList();
+      updateStats();
+    }
+
+    function addItemToList(text, dateText, done) {
+      const li = document.createElement("li");
+      if (done) li.classList.add("done");
+
+      const checkbox = document.createElement("div");
+      checkbox.className = "checkbox";
+
+      const itemText = document.createElement("div");
+      itemText.className = "item-text";
+      itemText.textContent = text;
+
+      const date = document.createElement("div");
+      date.className = "date";
+      date.textContent = dateText;
+
+      const left = document.createElement("div");
+      left.className = "item-left";
+      left.appendChild(checkbox);
+      left.appendChild(itemText);
+      left.appendChild(date);
+      left.onclick = () => toggleItem(li);
+
+      const del = document.createElement("span");
+      del.className = "delete";
+      del.textContent = "✕";
+      del.onclick = () => deleteItem(del);
+
+      li.appendChild(left);
+      li.appendChild(del);
+      document.getElementById("list").appendChild(li);
+    }
+
+    function updateStats() {
+      const all = document.querySelectorAll("#list li").length;
+      const done = document.querySelectorAll("#list li.done").length;
+      const remaining = all - done;
+      document.getElementById("stats").textContent = `Fuldførte mål: ${done} | Tilbage: ${remaining}`;
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+    }
+
+    loadList();
+    updateStats();
   </script>
 </body>
 </html>
