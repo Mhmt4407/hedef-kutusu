@@ -66,13 +66,16 @@
 
     .input-area {
       margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      max-width: 700px;
     }
 
     input[type="text"] {
       padding: 14px;
       font-size: 24px;
       font-weight: 700;
-      width: 60%;
+      flex-grow: 1;
       border: 2px solid #ccc;
       border-radius: 8px;
       transition: border-color 0.3s;
@@ -91,9 +94,11 @@
       color: var(--button-text);
       border: none;
       border-radius: 8px;
-      margin-left: 12px;
+      margin-left: 16px;
       cursor: pointer;
       transition: background-color 0.3s;
+      flex-shrink: 0;
+      min-width: 140px;
     }
 
     button:hover {
@@ -240,7 +245,6 @@
       const saved = localStorage.getItem("goalList");
       if (saved) {
         const items = JSON.parse(saved);
-        // Tarihe göre sıralama (en eski ilk)
         items.sort((a,b) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
@@ -321,5 +325,6 @@
   </script>
 </body>
 </html>
+
 
 
