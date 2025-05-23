@@ -2,10 +2,18 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Hedef Kutusu</title>
+    <title>Mine mål</title>
     <style>
-        body { font-family: Arial; background: #fff; color: #b00000; padding: 20px; }
-        h2 { font-size: 36px; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #fff; 
+            color: #b00000; 
+            padding: 20px; 
+        }
+        h2 { 
+            font-size: 36px; 
+            font-weight: bold; 
+        }
         li { 
             margin: 14px 0; 
             cursor: pointer; 
@@ -17,13 +25,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-weight: 700; /* fed */
         }
         li:hover {
             background-color: #f8d7da;
         }
-        .done { 
-            color: green; 
-            text-decoration: line-through; 
+        li.done {
+            color: green;
+            text-decoration: line-through;
+            font-weight: 700;
         }
         .delete-btn {
             background: transparent;
@@ -41,6 +51,7 @@
             border-radius: 6px;
             outline: none;
             box-sizing: border-box;
+            font-weight: 700;
         }
         input[type="text"]:focus {
             border-color: #660000;
@@ -55,6 +66,7 @@
             border-radius: 6px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            font-weight: 700;
         }
         button:hover {
             background-color: #660000;
@@ -106,9 +118,10 @@
     </script>
 </head>
 <body>
-    <h2>Hedef Kutusu</h2>
-    <input type="text" id="newItem" placeholder="Yeni hedef yaz...">
-    <button onclick="addItem()">Ekle</button>
+    <h2>Mine mål</h2>
+    <input type="text" id="newItem" placeholder="Skriv nyt mål...">
+    <button onclick="addItem()">Tilføj</button>
     <ul id="list"></ul>
 </body>
 </html>
+
