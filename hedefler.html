@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hedef Kutusu</title>
+    <style>
+        body { font-family: Arial; background: #fff; color: #b00000; padding: 20px; }
+        li { margin: 10px 0; cursor: pointer; font-size: 18px; }
+        .done { color: green; text-decoration: line-through; }
+    </style>
+    <script>
+        function toggleItem(el) {
+            el.classList.toggle("done");
+            if (el.classList.contains("done")) {
+                el.innerHTML = el.innerText + " ✔";
+            } else {
+                el.innerHTML = el.innerText.replace(" ✔", "");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h2>Hedef Kutusu</h2>
+    <ul>
+        <li onclick="toggleItem(this)">Kitap oku</li>
+        <li onclick="toggleItem(this)">Egzersiz yap</li>
+        <li onclick="toggleItem(this)">Yeni bir şey öğren</li>
+        <li onclick="toggleItem(this)">Telefonu 1 saat elleme</li>
+    </ul>
+</body>
+</html>
