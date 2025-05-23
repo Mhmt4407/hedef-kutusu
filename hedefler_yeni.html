@@ -24,34 +24,49 @@
         }
     </style>
     <script>
-        function toggleItem(el) {
-            el.classList.toggle("done");
-            if (el.classList.contains("done")) {
-                el.innerHTML = el.innerText + " ✔";
-            } else {
-                el.innerHTML = el.innerText.replace(" ✔", "");
-            }
+        let items = JSON.parse(localStorage.getItem("hedefler")) || [];
+
+        function saveList() {
+            localStorage.setItem("hedefler", JSON.stringify(items));
+        }
+
+        function renderList() {
+            const list = document.getElementById("list");
+            list.innerHTML = "";
+            items.forEach((item, index) => {
+                const li = document.createElement("li");
+                li.textContent = item.text;
+                if (item.done) {
+                    li.classList.add("done");
+                    li.innerHTML += " ✔";
+                }
+                li.onclick = function () {
+                    items[index].done = !items[index].done;
+                    saveList();
+                    renderList();
+                };
+                list.appendChild(li);
+            });
         }
 
         function addItem() {
             var input = document.getElementById("newItem");
             var text = input.value.trim();
             if (text !== "") {
-                var li = document.createElement("li");
-                li.textContent = text;
-                li.onclick = function() { toggleItem(this); };
-                document.getElementById("list").appendChild(li);
+                items.push({ text: text, done: false });
+                saveList();
+                renderList();
                 input.value = "";
             }
         }
+
+        window.onload = renderList;
     </script>
 </head>
 <body>
     <h2>Hedef Kutusu</h2>
     <input type="text" id="newItem" placeholder="Yeni hedef yaz...">
     <button onclick="addItem()">Ekle</button>
-    <ul id="list">
-        <!-- Başlangıçta boş, kullanıcı ekleyecek -->
-    </ul>
+    <ul id="list"></ul>
 </body>
 </html>
