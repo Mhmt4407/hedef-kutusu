@@ -9,6 +9,12 @@
       background: #ffffff;
       color: #202020;
       padding: 30px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark {
+      background: #121212;
+      color: #e0e0e0;
     }
 
     h2 {
@@ -49,7 +55,7 @@
 
     li {
       margin: 16px 0;
-      font-size: 24px;
+      font-size: 22px;
       font-weight: bold;
       display: flex;
       align-items: center;
@@ -59,16 +65,22 @@
       animation: fadeIn 0.4s ease-in;
     }
 
-    .item-text {
-      flex-grow: 1;
+    .item-left {
+      display: flex;
+      flex-direction: column;
       cursor: pointer;
     }
 
+    .item-text {
+      flex-grow: 1;
+    }
+
     .date {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: normal;
       color: #888;
       margin-top: 4px;
+      text-align: right;
     }
 
     .done .item-text {
@@ -91,6 +103,17 @@
       fill: currentColor;
     }
 
+    .stats {
+      margin-top: 30px;
+      font-size: 18px;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -98,12 +121,14 @@
   </style>
 </head>
 <body>
+  <button class="theme-toggle" onclick="toggleTheme()">Skift tema</button>
   <h2>Mine mål</h2>
   <div class="input-area">
     <input type="text" id="newItem" placeholder="Skriv et nyt mål..." />
     <button onclick="addItem()">Tilføj</button>
   </div>
   <ul id="list"></ul>
+  <div class="stats" id="stats"></div>
 
   <script>
     function capitalizeFirstLetter(word) {
@@ -126,6 +151,7 @@
         });
       });
       localStorage.setItem("goalList", JSON.stringify(items));
+      updateStats();
     }
 
     function loadList() {
@@ -136,6 +162,7 @@
           addItemToList(item.text, item.date, item.done);
         });
       }
+      updateStats();
     }
 
     function toggleItem(el) {
@@ -144,7 +171,7 @@
     }
 
     function deleteItem(el) {
-      el.parentElement.remove();
+      el.closest("li").remove();
       saveList();
     }
 
@@ -163,18 +190,17 @@
       const li = document.createElement("li");
       if (done) li.classList.add("done");
 
+      const itemLeft = document.createElement("div");
+      itemLeft.className = "item-left";
       const itemText = document.createElement("div");
       itemText.className = "item-text";
       itemText.textContent = text;
+      itemLeft.appendChild(itemText);
       itemText.onclick = () => toggleItem(li);
 
       const date = document.createElement("div");
       date.className = "date";
       date.textContent = dateText;
-
-      const container = document.createElement("div");
-      container.appendChild(itemText);
-      container.appendChild(date);
 
       const del = document.createElement("span");
       del.className = "delete";
@@ -184,10 +210,23 @@
         </svg>`;
       del.onclick = () => deleteItem(del);
 
-      li.appendChild(container);
+      li.appendChild(itemLeft);
+      li.appendChild(date);
       li.appendChild(del);
-
       document.getElementById("list").appendChild(li);
+    }
+
+    function updateStats() {
+      const items = document.querySelectorAll("#list li");
+      const total = items.length;
+      const done = document.querySelectorAll("#list .done").length;
+      const remaining = total - done;
+      document.getElementById("stats").textContent = 
+        `Fuldførte mål: ${done} | Tilbage: ${remaining}`;
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
     }
 
     loadList();
