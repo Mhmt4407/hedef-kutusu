@@ -5,11 +5,11 @@
     <title>Hedef Kutusu</title>
     <style>
         body { font-family: Arial; background: #fff; color: #b00000; padding: 20px; }
-        h2 { font-size: 32px; }
+        h2 { font-size: 36px; }
         li { 
             margin: 14px 0; 
             cursor: pointer; 
-            font-size: 26px; 
+            font-size: 30px; 
             padding: 10px 8px; 
             user-select: none; 
             border-radius: 6px;
@@ -29,13 +29,13 @@
             background: transparent;
             border: none;
             color: green;
-            font-size: 24px;
+            font-size: 30px;
             cursor: pointer;
             margin-left: 12px;
         }
         input[type="text"] {
-            padding: 14px 12px;
-            font-size: 24px;
+            padding: 16px 12px;
+            font-size: 30px;
             width: 75%;
             border: 2px solid #b00000;
             border-radius: 6px;
@@ -46,8 +46,8 @@
             border-color: #660000;
         }
         button {
-            padding: 14px 28px;
-            font-size: 24px;
+            padding: 16px 32px;
+            font-size: 30px;
             margin-left: 12px;
             background-color: #b00000;
             color: white;
@@ -78,7 +78,7 @@
                 btn.textContent = "✖";
                 btn.className = "delete-btn";
                 btn.onclick = function(e) {
-                    e.stopPropagation(); // toggleItem’ın tetiklenmesini engelle
+                    e.stopPropagation();
                     el.remove();
                 };
                 el.appendChild(btn);
@@ -109,7 +109,6 @@
     <h2>Hedef Kutusu</h2>
     <input type="text" id="newItem" placeholder="Yeni hedef yaz...">
     <button onclick="addItem()">Ekle</button>
-    <ul id="list">
-    </ul>
+    <ul id="list"></ul>
 </body>
 </html>
