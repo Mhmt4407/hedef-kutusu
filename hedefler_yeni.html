@@ -1,64 +1,62 @@
 
-
 <!DOCTYPE html>
 <html lang="da">
 <head>
   <meta charset="UTF-8" />
   <title>Mine mål</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     :root {
-      --bg-color: #fff;
+      --bg-color: #ffffff;
       --text-color: #202020;
-      --box-color: #fdf8e4;
+      --input-border: #ffeb99;
+      --done-color: green;
+      --delete-color: red;
       --button-color: #008000;
-      --border-color: #ccc;
+      --box-shadow: rgba(0, 0, 0, 0.1);
     }
 
     body.dark {
       --bg-color: #121212;
       --text-color: #e0e0e0;
-      --box-color: #1f1f1f;
-      --button-color: #4caf50;
-      --border-color: #555;
+      --input-border: #444;
+      --done-color: #4caf50;
+      --delete-color: #ff6b6b;
+      --button-color: #00c853;
+      --box-shadow: rgba(255, 255, 255, 0.1);
     }
 
     body {
       font-family: Arial, sans-serif;
       background: var(--bg-color);
       color: var(--text-color);
-      padding: 20px;
+      padding: 30px;
       transition: background 0.3s, color 0.3s;
     }
 
     h2 {
-      font-size: 32px;
+      font-size: 36px;
       margin-bottom: 20px;
       font-weight: bold;
     }
 
     .input-area {
-      margin-bottom: 30px;
+      margin-bottom: 40px;
       display: flex;
-      flex-wrap: wrap;
       gap: 10px;
-      background: var(--box-color);
-      padding: 15px;
-      border: 2px solid #f2d86d;
-      border-radius: 8px;
     }
 
     input[type="text"] {
-      flex: 1 1 250px;
-      padding: 12px;
-      font-size: 20px;
-      border: 1px solid var(--border-color);
+      padding: 14px;
+      font-size: 22px;
+      width: 60%;
+      border: 2px solid var(--input-border);
       border-radius: 8px;
+      flex: 1;
     }
 
     button {
-      padding: 12px 20px;
-      font-size: 20px;
+      padding: 14px 26px;
+      font-size: 22px;
       background-color: var(--button-color);
       color: white;
       border: none;
@@ -66,13 +64,13 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 8px;
     }
 
     .toggle-theme {
       margin-bottom: 20px;
-      cursor: pointer;
       font-size: 16px;
+      cursor: pointer;
       text-decoration: underline;
     }
 
@@ -83,53 +81,57 @@
 
     li {
       margin: 16px 0;
-      font-size: 22px;
+      font-size: 24px;
       font-weight: bold;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 6px;
-      transition: background 0.3s;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
     }
 
     .item-text {
       flex-grow: 1;
+      cursor: pointer;
     }
 
     .date {
       font-size: 14px;
-      font-weight: normal;
-      color: gray;
-      margin-left: 10px;
-    }
-
-    .done .item-text::before {
-      content: "✔ ";
-      color: green;
+      color: #888;
+      text-align: right;
+      margin-left: 20px;
     }
 
     .done .item-text {
-      color: green;
+      color: var(--done-color);
       text-decoration: line-through;
     }
 
     .delete {
-      margin-left: 15px;
+      margin-left: 20px;
+      color: var(--delete-color);
       cursor: pointer;
-      font-size: 20px;
-      color: var(--button-color);
+      font-size: 22px;
+    }
+
+    .checkbox {
+      width: 22px;
+      height: 22px;
+      margin-right: 10px;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      display: inline-block;
+      background-color: white;
+    }
+
+    .done .checkbox {
+      background-color: var(--done-color);
     }
 
     .stats {
-      margin-top: 30px;
+      margin-top: 40px;
       font-size: 18px;
-    }
-
-    @media (max-width: 600px) {
-      .input-area {
-        flex-direction: column;
-      }
+      font-weight: bold;
     }
   </style>
 </head>
@@ -146,8 +148,8 @@
   <script>
     function formatDate() {
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      const dateStr = new Date().toLocaleDateString('da-DK', options);
-      return dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+      const date = new Date().toLocaleDateString('da-DK', options);
+      return date.charAt(0).toUpperCase() + date.slice(1);
     }
 
     function saveList() {
@@ -165,11 +167,17 @@
     function loadList() {
       const saved = localStorage.getItem("goalList");
       if (saved) {
-        JSON.parse(saved).forEach(item => {
+        const items = JSON.parse(saved);
+        items.forEach(item => {
           addItemToList(item.text, item.date, item.done);
         });
       }
-      updateStats();
+    }
+
+    function updateStats() {
+      const total = document.querySelectorAll("#list li").length;
+      const completed = document.querySelectorAll("#list li.done").length;
+      document.getElementById("stats").textContent = `Færdige: ${completed} / ${total}`;
     }
 
     function toggleItem(el) {
@@ -200,6 +208,9 @@
       const li = document.createElement("li");
       if (done) li.classList.add("done");
 
+      const checkbox = document.createElement("span");
+      checkbox.className = "checkbox";
+
       const itemText = document.createElement("div");
       itemText.className = "item-text";
       itemText.textContent = text;
@@ -211,28 +222,42 @@
 
       const del = document.createElement("span");
       del.className = "delete";
-      del.innerHTML = "🗑️";
+      del.innerHTML = "🗑";
       del.onclick = () => deleteItem(del);
 
-      li.appendChild(itemText);
-      li.appendChild(date);
+      const left = document.createElement("div");
+      left.style.display = "flex";
+      left.style.alignItems = "center";
+      left.appendChild(checkbox);
+      left.appendChild(itemText);
+
+      const container = document.createElement("div");
+      container.style.display = "flex";
+      container.style.flexDirection = "column";
+      container.appendChild(left);
+      container.appendChild(date);
+
+      li.appendChild(container);
       li.appendChild(del);
 
       document.getElementById("list").appendChild(li);
     }
 
-    function updateStats() {
-      const total = document.querySelectorAll("#list li").length;
-      const done = document.querySelectorAll("#list li.done").length;
-      const left = total - done;
-      document.getElementById("stats").textContent = `Fuldført: ${done} | Mangler: ${left}`;
-    }
-
     function toggleTheme() {
       document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
     }
 
+    function loadTheme() {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "dark") {
+        document.body.classList.add("dark");
+      }
+    }
+
+    loadTheme();
     loadList();
+    updateStats();
   </script>
 </body>
 </html>
