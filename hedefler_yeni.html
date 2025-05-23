@@ -5,68 +5,111 @@
     <title>Hedef Kutusu</title>
     <style>
         body { font-family: Arial; background: #fff; color: #b00000; padding: 20px; }
-        h2 { font-size: 28px; }
-        li { margin: 12px 0; cursor: pointer; font-size: 22px; }
-        .done { color: green; text-decoration: line-through; }
+        h2 { font-size: 32px; }
+        li { 
+            margin: 14px 0; 
+            cursor: pointer; 
+            font-size: 26px; 
+            padding: 10px 8px; 
+            user-select: none; 
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        li:hover {
+            background-color: #f8d7da;
+        }
+        .done { 
+            color: green; 
+            text-decoration: line-through; 
+        }
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: green;
+            font-size: 24px;
+            cursor: pointer;
+            margin-left: 12px;
+        }
         input[type="text"] {
-            padding: 10px;
-            font-size: 20px;
-            width: 70%;
+            padding: 14px 12px;
+            font-size: 24px;
+            width: 75%;
+            border: 2px solid #b00000;
+            border-radius: 6px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus {
+            border-color: #660000;
         }
         button {
-            padding: 10px 20px;
-            font-size: 20px;
-            margin-left: 10px;
+            padding: 14px 28px;
+            font-size: 24px;
+            margin-left: 12px;
             background-color: #b00000;
             color: white;
             border: none;
+            border-radius: 6px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #660000;
         }
     </style>
     <script>
-        let items = JSON.parse(localStorage.getItem("hedefler")) || [];
-
-        function saveList() {
-            localStorage.setItem("hedefler", JSON.stringify(items));
+        function toggleItem(el) {
+            el.classList.toggle("done");
+            if (el.classList.contains("done")) {
+                el.innerHTML = el.innerText + " ✔";
+                addDeleteButton(el);
+            } else {
+                removeDeleteButton(el);
+                el.innerHTML = el.innerText.replace(" ✔", "");
+            }
         }
 
-        function renderList() {
-            const list = document.getElementById("list");
-            list.innerHTML = "";
-            items.forEach((item, index) => {
-                const li = document.createElement("li");
-                li.textContent = item.text;
-                if (item.done) {
-                    li.classList.add("done");
-                    li.innerHTML += " ✔";
-                }
-                li.onclick = function () {
-                    items[index].done = !items[index].done;
-                    saveList();
-                    renderList();
+        function addDeleteButton(el) {
+            if (!el.querySelector(".delete-btn")) {
+                var btn = document.createElement("button");
+                btn.textContent = "✖";
+                btn.className = "delete-btn";
+                btn.onclick = function(e) {
+                    e.stopPropagation(); // toggleItem’ın tetiklenmesini engelle
+                    el.remove();
                 };
-                list.appendChild(li);
-            });
+                el.appendChild(btn);
+            }
+        }
+
+        function removeDeleteButton(el) {
+            var btn = el.querySelector(".delete-btn");
+            if (btn) {
+                btn.remove();
+            }
         }
 
         function addItem() {
             var input = document.getElementById("newItem");
             var text = input.value.trim();
             if (text !== "") {
-                items.push({ text: text, done: false });
-                saveList();
-                renderList();
+                var li = document.createElement("li");
+                li.textContent = text;
+                li.onclick = function() { toggleItem(this); };
+                document.getElementById("list").appendChild(li);
                 input.value = "";
             }
         }
-
-        window.onload = renderList;
     </script>
 </head>
 <body>
     <h2>Hedef Kutusu</h2>
     <input type="text" id="newItem" placeholder="Yeni hedef yaz...">
     <button onclick="addItem()">Ekle</button>
-    <ul id="list"></ul>
+    <ul id="list">
+    </ul>
 </body>
 </html>
