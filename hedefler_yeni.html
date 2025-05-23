@@ -32,6 +32,10 @@
       color: var(--text-color);
       padding: 30px;
       transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .top-bar {
@@ -39,6 +43,9 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 25px;
+      width: 100%;
+      max-width: 720px;
+      padding: 0 10px;
     }
 
     h2 {
@@ -69,6 +76,8 @@
       display: flex;
       align-items: center;
       max-width: 700px;
+      width: 100%;
+      padding: 0 10px;
     }
 
     input[type="text"] {
@@ -99,16 +108,33 @@
       transition: background-color 0.3s;
       flex-shrink: 0;
       min-width: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     button:hover {
       background-color: #005500cc;
     }
 
+    button svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
     ul {
       list-style-type: none;
       padding-left: 0;
       margin-bottom: 30px;
+      max-width: 720px;
+      width: 100%;
+      padding: 0 10px;
     }
 
     li {
@@ -121,7 +147,14 @@
       border-radius: 8px;
       padding: 14px 20px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      transition: background 0.3s;
+      transition: background 0.3s, transform 0.3s, opacity 0.4s;
+      cursor: default;
+      opacity: 1;
+    }
+    li:hover {
+      background: #d0ffd0cc;
+      box-shadow: 0 4px 12px rgba(0, 150, 0, 0.3);
+      transform: scale(1.02);
     }
 
     .item-left {
@@ -191,6 +224,7 @@
       margin-left: 24px;
       user-select: none;
       transition: color 0.3s;
+      flex-shrink: 0;
     }
 
     .delete:hover {
@@ -204,6 +238,119 @@
       border-top: 2px solid var(--text-color);
       padding-top: 15px;
       max-width: 400px;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    /* Animasyon ekleme */
+    .fade-in {
+      animation: fadeInAnim 0.4s ease forwards;
+    }
+    @keyframes fadeInAnim {
+      from {opacity: 0; transform: translateY(10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    .fade-out {
+      animation: fadeOutAnim 0.4s ease forwards;
+    }
+    @keyframes fadeOutAnim {
+      from {opacity: 1; transform: translateY(0);}
+      to {opacity: 0; transform: translateY(-10px);}
+    }
+
+    /* Arşiv bölümü */
+    #archiveSection {
+      max-width: 720px;
+      width: 100%;
+      padding: 0 10px;
+      margin-top: 10px;
+      border-top: 2px solid var(--text-color);
+    }
+
+    #archiveSection h3 {
+      font-weight: 900;
+      font-size: 28px;
+      margin-bottom: 10px;
+      text-align: center;
+      color: var(--text-color);
+    }
+
+    #archiveList {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    #archiveList li {
+      margin: 10px 0;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--item-bg);
+      border-radius: 8px;
+      padding: 10px 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      color: #999;
+      user-select: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body {
+        padding: 20px 10px;
+      }
+
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+
+      h2 {
+        font-size: 36px;
+      }
+
+      .toggle-theme {
+        width: 100%;
+      }
+
+      .input-area {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        max-width: 100%;
+      }
+
+      input[type="text"] {
+        font-size: 20px;
+      }
+
+      button {
+        margin-left: 0;
+        min-width: unset;
+        font-size: 20px;
+        padding: 12px;
+      }
+
+      ul, #archiveSection {
+        padding: 0 5px;
+      }
+
+      li {
+        font-size: 20px;
+        padding: 12px 16px;
+      }
+
+      .date {
+        font-size: 16px;
+      }
+
+      .stats {
+        font-size: 20px;
+        max-width: 100%;
+      }
     }
   </style>
 </head>
@@ -214,117 +361,201 @@
   </div>
 
   <div class="input-area">
-    <input type="text" id="newItem" placeholder="Skriv et nyt mål..." />
-    <button onclick="addItem()">Tilføj</button>
+    <input
+      type="text"
+      id="goalInput"
+      placeholder="Skriv et nyt mål..."
+      aria-label="Nyt mål"
+      autocomplete="off"
+    />
+    <button id="addBtn" aria-label="Tilføj mål">
+      Tilføj
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+    </button>
   </div>
 
-  <ul id="list"></ul>
+  <ul id="goalList" aria-live="polite" aria-relevant="additions removals"></ul>
 
-  <div class="stats" id="stats"></div>
+  <div class="stats" aria-live="polite" aria-atomic="true"></div>
+
+  <section id="archiveSection" aria-label="Arkiverede mål" hidden>
+    <h3>Arkiverede mål</h3>
+    <ul id="archiveList"></ul>
+  </section>
 
   <script>
-    function formatDate() {
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      let dateStr = new Date().toLocaleDateString('da-DK', options);
-      return dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-    }
+    const goalInput = document.getElementById("goalInput");
+    const addBtn = document.getElementById("addBtn");
+    const goalList = document.getElementById("goalList");
+    const archiveSection = document.getElementById("archiveSection");
+    const archiveList = document.getElementById("archiveList");
+    const stats = document.querySelector(".stats");
 
-    function saveList() {
-      const items = [];
-      document.querySelectorAll("#list li").forEach(li => {
-        items.push({
-          text: li.querySelector(".item-text").textContent,
-          date: li.querySelector(".date").textContent,
-          done: li.classList.contains("done")
-        });
-      });
-      localStorage.setItem("goalList", JSON.stringify(items));
-    }
+    let goals = [];
+    let archive = [];
 
-    function loadList() {
-      const saved = localStorage.getItem("goalList");
-      if (saved) {
-        const items = JSON.parse(saved);
-        items.sort((a,b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          return dateA - dateB;
-        });
-        items.forEach(item => addItemToList(item.text, item.date, item.done));
-      }
-    }
-
-    function toggleItem(li) {
-      li.classList.toggle("done");
-      saveList();
-      updateStats();
-    }
-
-    function deleteItem(el) {
-      el.parentElement.remove();
-      saveList();
-      updateStats();
-    }
-
-    function addItem() {
-      const input = document.getElementById("newItem");
-      const text = input.value.trim();
-      if (text === "") return;
-      const date = formatDate();
-      addItemToList(text, date, false);
-      input.value = "";
-      saveList();
-      updateStats();
-    }
-
-    function addItemToList(text, dateText, done) {
-      const li = document.createElement("li");
-      if (done) li.classList.add("done");
-
-      const checkbox = document.createElement("div");
-      checkbox.className = "checkbox";
-
-      const itemText = document.createElement("div");
-      itemText.className = "item-text";
-      itemText.textContent = text;
-
-      const date = document.createElement("div");
-      date.className = "date";
-      date.textContent = dateText;
-
-      const left = document.createElement("div");
-      left.className = "item-left";
-      left.appendChild(checkbox);
-      left.appendChild(itemText);
-      left.appendChild(date);
-      left.onclick = () => toggleItem(li);
-
-      const del = document.createElement("span");
-      del.className = "delete";
-      del.textContent = "✕";
-      del.onclick = () => deleteItem(del);
-
-      li.appendChild(left);
-      li.appendChild(del);
-      document.getElementById("list").appendChild(li);
-    }
-
-    function updateStats() {
-      const all = document.querySelectorAll("#list li").length;
-      const done = document.querySelectorAll("#list li.done").length;
-      const remaining = all - done;
-      document.getElementById("stats").textContent = `Fuldførte mål: ${done} | Tilbage: ${remaining}`;
-    }
-
+    // Tema kontrolü
     function toggleTheme() {
       document.body.classList.toggle("dark");
+      localStorage.setItem("darkTheme", document.body.classList.contains("dark"));
+    }
+    // Sayfa açılırken tema yükle
+    if (localStorage.getItem("darkTheme") === "true") {
+      document.body.classList.add("dark");
     }
 
-    loadList();
-    updateStats();
+    // Tarih formatlama fonksiyonu
+    function formatDate(date) {
+      return date.toLocaleDateString("da-DK", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    }
+
+    // İstatistik güncelleme
+    function updateStats() {
+      const total = goals.length + archive.length;
+      const doneCount = goals.filter(g => g.done).length + archive.filter(g => g.done).length;
+      stats.textContent = `Totalt: ${total} mål | Færdige: ${doneCount}`;
+    }
+
+    // Listeyi render et
+    function renderList() {
+      // Sıralama: tamamlanmamışlar önce, tarih eski -> yeni
+      goals.sort((a, b) => {
+        if (a.done !== b.done) return a.done - b.done;
+        return new Date(a.created) - new Date(b.created);
+      });
+
+      goalList.innerHTML = "";
+      goals.forEach(goal => {
+        const li = document.createElement("li");
+        li.className = goal.done ? "done fade-in" : "fade-in";
+
+        // Sol taraf: checkbox + metin
+        const leftDiv = document.createElement("div");
+        leftDiv.className = "item-left";
+        leftDiv.tabIndex = 0;
+        leftDiv.setAttribute("role", "checkbox");
+        leftDiv.setAttribute("aria-checked", goal.done);
+
+        // Checkbox kutusu
+        const checkbox = document.createElement("div");
+        checkbox.className = "checkbox";
+        leftDiv.appendChild(checkbox);
+
+        // Metin
+        const textSpan = document.createElement("span");
+        textSpan.className = "item-text";
+        textSpan.textContent = goal.text;
+        leftDiv.appendChild(textSpan);
+
+        // Tarih
+        const dateSpan = document.createElement("span");
+        dateSpan.className = "date";
+        dateSpan.textContent = formatDate(new Date(goal.created));
+        leftDiv.appendChild(dateSpan);
+
+        li.appendChild(leftDiv);
+
+        // Silme butonu
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "delete";
+        deleteBtn.setAttribute("aria-label", `Slet mål: ${goal.text}`);
+        deleteBtn.innerHTML = "×";
+        li.appendChild(deleteBtn);
+
+        goalList.appendChild(li);
+
+        // İşaretleme tıklama olayı
+        leftDiv.addEventListener("click", () => toggleDone(goal.id));
+        leftDiv.addEventListener("keypress", e => {
+          if (e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            toggleDone(goal.id);
+          }
+        });
+
+        // Silme olayı
+        deleteBtn.addEventListener("click", () => deleteGoal(goal.id));
+      });
+
+      updateStats();
+    }
+
+    // Arşivi render et
+    function renderArchive() {
+      if (archive.length === 0) {
+        archiveSection.hidden = true;
+        return;
+      }
+      archiveSection.hidden = false;
+      archiveList.innerHTML = "";
+      archive.forEach(goal => {
+        const li = document.createElement("li");
+        li.textContent = goal.text;
+        archiveList.appendChild(li);
+      });
+    }
+
+    // Yeni hedef ekle
+    function addGoal() {
+      const text = goalInput.value.trim();
+      if (!text) return;
+
+      const newGoal = {
+        id: Date.now(),
+        text,
+        done: false,
+        created: new Date().toISOString(),
+      };
+      goals.push(newGoal);
+      goalInput.value = "";
+      renderList();
+    }
+
+    // İşaretleme / tamamlama değiştir
+    function toggleDone(id) {
+      const goal = goals.find(g => g.id === id);
+      if (!goal) return;
+
+      goal.done = !goal.done;
+
+      // Eğer tamamlandıysa arşive taşı (istersen kaldırabiliriz)
+      if (goal.done) {
+        // Burada hedefi arşive taşımak için:
+        archive.push(goal);
+        goals = goals.filter(g => g.id !== id);
+        renderArchive();
+      }
+      renderList();
+    }
+
+    // Hedef sil
+    function deleteGoal(id) {
+      // Önce aktiflerden kontrol et
+      if (goals.some(g => g.id === id)) {
+        goals = goals.filter(g => g.id !== id);
+      } else {
+        // Arşivden sil
+        archive = archive.filter(g => g.id !== id);
+        renderArchive();
+      }
+      renderList();
+    }
+
+    // Event listener
+    addBtn.addEventListener("click", addGoal);
+    goalInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") addGoal();
+    });
+
+    // Sayfa açılırken listeyi renderla
+    renderList();
+    renderArchive();
   </script>
 </body>
 </html>
-
-
-
