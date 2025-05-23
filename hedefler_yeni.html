@@ -68,7 +68,7 @@
       margin-bottom: 30px;
       display: flex;
       align-items: center;
-      max-width: 800px;
+      width: 100%;
     }
 
     input[type="text"] {
@@ -99,7 +99,9 @@
       cursor: pointer;
       transition: background-color 0.3s;
       flex-shrink: 0;
-      min-width: 140px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     button:hover {
@@ -216,7 +218,7 @@
 
   <div class="input-area">
     <input type="text" id="newItem" placeholder="Skriv et nyt mål..." />
-    <button onclick="addItem()">Tilføj</button>
+    <button onclick="addItem()">➕ Tilføj</button>
   </div>
 
   <ul id="list"></ul>
@@ -302,7 +304,7 @@
 
       const del = document.createElement("span");
       del.className = "delete";
-      del.innerHTML = "🗑️"; // Çöp kutusu simgesi
+      del.innerHTML = "🗑️";
       del.onclick = () => deleteItem(del);
 
       li.appendChild(left);
