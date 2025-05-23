@@ -8,12 +8,22 @@
       --bg-color: #ffffff;
       --text-color: #202020;
       --item-bg: #f0f0f0;
+      --checkbox-border: #888;
+      --checkbox-check: green;
+      --delete-color: red;
+      --button-bg: #008000;
+      --button-text: white;
     }
 
     body.dark {
       --bg-color: #121212;
       --text-color: #e0e0e0;
       --item-bg: #1f1f1f;
+      --checkbox-border: #aaa;
+      --checkbox-check: #00ff00;
+      --delete-color: #ff5555;
+      --button-bg: #005500;
+      --button-text: #ddffdd;
     }
 
     body {
@@ -28,21 +38,30 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 25px;
     }
 
     h2 {
-      font-size: 40px;
-      margin-bottom: 20px;
+      font-size: 44px;
+      font-weight: 900;
+      margin: 0;
     }
 
     .toggle-theme {
       background: none;
       border: 2px solid var(--text-color);
       color: var(--text-color);
-      font-size: 16px;
-      padding: 6px 12px;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 8px 16px;
       border-radius: 8px;
       cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .toggle-theme:hover {
+      background: var(--text-color);
+      color: var(--bg-color);
     }
 
     .input-area {
@@ -50,100 +69,136 @@
     }
 
     input[type="text"] {
-      padding: 12px;
+      padding: 14px;
       font-size: 24px;
+      font-weight: 700;
       width: 60%;
-      border: 1px solid #ccc;
+      border: 2px solid #ccc;
       border-radius: 8px;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--button-bg);
     }
 
     button {
-      padding: 12px 24px;
+      padding: 14px 28px;
       font-size: 24px;
-      background-color: #008000;
-      color: white;
+      font-weight: 700;
+      background-color: var(--button-bg);
+      color: var(--button-text);
       border: none;
       border-radius: 8px;
-      margin-left: 10px;
+      margin-left: 12px;
       cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #005500cc;
     }
 
     ul {
       list-style-type: none;
       padding-left: 0;
+      margin-bottom: 30px;
     }
 
     li {
-      margin: 16px 0;
+      margin: 18px 0;
       font-size: 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       background: var(--item-bg);
       border-radius: 8px;
-      padding: 12px;
+      padding: 14px 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       transition: background 0.3s;
     }
 
     .item-left {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       flex-grow: 1;
-      gap: 12px;
+      gap: 16px;
       cursor: pointer;
+      user-select: none;
     }
 
     .checkbox {
-      width: 24px;
-      height: 24px;
-      border: 2px solid #888;
+      width: 28px;
+      height: 28px;
+      border: 2.5px solid var(--checkbox-border);
       border-radius: 6px;
       position: relative;
+      transition: border-color 0.3s;
+      flex-shrink: 0;
+    }
+
+    .done .checkbox {
+      border-color: var(--checkbox-check);
+      background-color: var(--checkbox-check);
     }
 
     .done .checkbox::after {
       content: "✔";
       position: absolute;
-      top: -2px;
-      left: 4px;
-      color: green;
+      top: 1px;
+      left: 6px;
+      color: white;
       font-size: 22px;
-      opacity: 0;
-      transform: scale(0.8) rotate(-90deg);
-      animation: checkFade 0.4s forwards ease-out;
+      font-weight: 900;
+      animation: checkFade 0.4s ease forwards;
     }
 
     @keyframes checkFade {
-      to {
-        opacity: 1;
-        transform: scale(1) rotate(0deg);
-      }
+      from {opacity: 0; transform: scale(0.7) rotate(-45deg);}
+      to {opacity: 1; transform: scale(1) rotate(0deg);}
     }
 
     .done .item-text {
-      color: green;
+      color: var(--checkbox-check);
       text-decoration: line-through;
     }
 
     .item-text {
       flex-grow: 1;
+      font-weight: 700;
+      color: var(--text-color);
+      transition: color 0.3s;
     }
 
     .date {
-      font-size: 16px;
-      color: #888;
+      font-size: 18px;
+      color: #666;
+      font-weight: 700;
+      white-space: nowrap;
+      user-select: none;
     }
 
     .delete {
-      color: red;
-      font-size: 24px;
+      color: var(--delete-color);
+      font-size: 28px;
       cursor: pointer;
-      margin-left: 20px;
+      margin-left: 24px;
+      user-select: none;
+      transition: color 0.3s;
+    }
+
+    .delete:hover {
+      color: #ff0000cc;
     }
 
     .stats {
-      margin-top: 30px;
-      font-size: 18px;
+      font-size: 22px;
+      font-weight: 800;
+      user-select: none;
+      border-top: 2px solid var(--text-color);
+      padding-top: 15px;
+      max-width: 400px;
     }
   </style>
 </head>
@@ -165,7 +220,7 @@
   <script>
     function formatDate() {
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      const dateStr = new Date().toLocaleDateString('da-DK', options);
+      let dateStr = new Date().toLocaleDateString('da-DK', options);
       return dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
     }
 
@@ -185,7 +240,12 @@
       const saved = localStorage.getItem("goalList");
       if (saved) {
         const items = JSON.parse(saved);
-        items.sort((a, b) => new Date(a.date) - new Date(b.date));
+        // Tarihe göre sıralama (en eski ilk)
+        items.sort((a,b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return dateA - dateB;
+        });
         items.forEach(item => addItemToList(item.text, item.date, item.done));
       }
     }
@@ -205,13 +265,12 @@
     function addItem() {
       const input = document.getElementById("newItem");
       const text = input.value.trim();
-      if (text !== "") {
-        const date = formatDate();
-        addItemToList(text, date, false);
-        input.value = "";
-        saveList();
-        updateStats();
-      }
+      if (text === "") return;
+      const date = formatDate();
+      addItemToList(text, date, false);
+      input.value = "";
+      saveList();
+      updateStats();
     }
 
     function addItemToList(text, dateText, done) {
@@ -231,10 +290,10 @@
 
       const left = document.createElement("div");
       left.className = "item-left";
-      left.onclick = () => toggleItem(li);
       left.appendChild(checkbox);
       left.appendChild(itemText);
       left.appendChild(date);
+      left.onclick = () => toggleItem(li);
 
       const del = document.createElement("span");
       del.className = "delete";
@@ -262,4 +321,5 @@
   </script>
 </body>
 </html>
+
 
