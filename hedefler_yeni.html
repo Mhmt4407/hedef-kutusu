@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <title>Mine mål</title>
   <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
     :root {
       --bg-color: #ffffff;
       --text-color: #202020;
@@ -13,7 +17,10 @@
       --delete-color: red;
       --button-bg: #008000;
       --button-text: white;
-      --input-bg: #ffffff;
+      --hover-accent: #006600;
+      --focus-outline: #33aa33;
+      --date-color: #666;
+      --date-icon-color: #888;
     }
 
     body.dark {
@@ -25,7 +32,10 @@
       --delete-color: #ff5555;
       --button-bg: #005500;
       --button-text: #ddffdd;
-      --input-bg: #2a2a2a;
+      --hover-accent: #009900;
+      --focus-outline: #55ff55;
+      --date-color: #aaa;
+      --date-icon-color: #bbb;
     }
 
     body {
@@ -56,89 +66,78 @@
       font-size: 18px;
       font-weight: 700;
       padding: 8px 16px;
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
-      transition: background 0.3s, color 0.3s;
+      transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+      box-shadow: none;
     }
-
-    .toggle-theme:hover {
-      background: var(--text-color);
-      color: var(--bg-color);
+    .toggle-theme:hover,
+    .toggle-theme:focus {
+      background: var(--hover-accent);
+      color: var(--button-text);
+      outline: none;
+      box-shadow: 0 0 8px var(--hover-accent);
     }
 
     .input-area {
       margin-bottom: 30px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
+      width: 100%;
+      gap: 12px;
     }
 
-    input[type="text"] {
-      padding: 14px;
+    input[type="text"], input[type="date"] {
+      padding: 18px;
       font-size: 24px;
       font-weight: 700;
+      border: 2px solid var(--button-bg);
+      border-radius: 12px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      box-shadow: 0 0 0 1px var(--button-bg);
       flex-grow: 1;
-      min-width: 300px;
-      border: 2px solid var(--button-bg);
-      border-radius: 8px;
-      background: var(--input-bg);
-      color: var(--text-color);
-      transition: border-color 0.3s;
     }
-
-    input[type="text"]:focus {
+    input[type="text"]:focus, input[type="date"]:focus {
       outline: none;
-      border-color: var(--button-bg);
+      border-color: var(--hover-accent);
+      box-shadow: 0 0 8px var(--hover-accent);
     }
-
-    .date-wrapper {
-      position: relative;
-    }
-
-    .date-placeholder {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #888;
-      pointer-events: none;
-      font-size: 18px;
-    }
-
     input[type="date"] {
-      padding: 12px;
-      font-size: 18px;
-      border-radius: 8px;
-      border: 2px solid var(--button-bg);
-      background: var(--input-bg);
+      max-width: 180px;
       color: var(--text-color);
-      transition: border-color 0.3s;
+      background-color: var(--item-bg);
     }
-
-    input[type="date"]:focus {
-      outline: none;
-      border-color: var(--button-bg);
+    body.dark input[type="date"] {
+      background-color: var(--item-bg);
+      color: var(--text-color);
     }
 
     button {
-      padding: 14px 20px;
-      font-size: 20px;
+      padding: 14px 28px;
+      font-size: 24px;
       font-weight: 700;
       background-color: var(--button-bg);
       color: var(--button-text);
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
+      margin-left: 0;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s, box-shadow 0.3s;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       gap: 10px;
+      box-shadow: 0 4px 8px rgba(0, 128, 0, 0.4);
+      user-select: none;
     }
-
-    button:hover {
-      background-color: #005500cc;
+    button:hover, button:focus {
+      background-color: var(--hover-accent);
+      box-shadow: 0 6px 12px rgba(0, 153, 0, 0.6);
+      outline: none;
+    }
+    button:active {
+      transform: scale(0.97);
+      transition: transform 0.1s;
     }
 
     ul {
@@ -154,9 +153,14 @@
       align-items: center;
       justify-content: space-between;
       background: var(--item-bg);
-      border-radius: 8px;
+      border-radius: 12px;
       padding: 14px 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      transition: background 0.3s, box-shadow 0.3s;
+      user-select: none;
+    }
+    li:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
     }
 
     .item-left {
@@ -172,47 +176,66 @@
       width: 28px;
       height: 28px;
       border: 2.5px solid var(--checkbox-border);
-      border-radius: 6px;
+      border-radius: 8px;
       position: relative;
+      transition: border-color 0.3s, background-color 0.3s;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-
+    .checkbox::after {
+      content: "";
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      font-size: 22px;
+      font-weight: 900;
+      color: white;
+      user-select: none;
+    }
     .done .checkbox {
       border-color: var(--checkbox-check);
       background-color: var(--checkbox-check);
     }
-
     .done .checkbox::after {
       content: "✔";
-      position: absolute;
-      top: 1px;
-      left: 6px;
-      color: white;
-      font-size: 22px;
-      font-weight: 900;
+      opacity: 1;
+      animation: checkFade 0.4s ease forwards;
+    }
+    @keyframes checkFade {
+      from {opacity: 0; transform: scale(0.7) rotate(-45deg);}
+      to {opacity: 1; transform: scale(1) rotate(0deg);}
     }
 
     .done .item-text {
       color: var(--checkbox-check);
       text-decoration: line-through;
+      transition: color 0.3s;
     }
 
     .item-text {
       flex-grow: 1;
       font-weight: 700;
       color: var(--text-color);
+      transition: color 0.3s;
     }
 
     .date {
       font-size: 18px;
-      color: #666;
+      color: var(--date-color);
       font-weight: 700;
+      white-space: nowrap;
+      user-select: none;
       display: flex;
       align-items: center;
       gap: 6px;
+      flex-shrink: 0;
     }
-
-    .date::before {
-      content: "🗓️";
+    .date-icon {
+      font-size: 18px;
+      color: var(--date-icon-color);
+      user-select: none;
+      display: inline-block;
     }
 
     .delete {
@@ -221,10 +244,14 @@
       cursor: pointer;
       margin-left: 24px;
       user-select: none;
+      transition: color 0.3s;
+      flex-shrink: 0;
     }
-
-    .delete:hover {
+    .delete:hover,
+    .delete:focus {
       color: #ff0000cc;
+      outline: none;
+      text-shadow: 0 0 4px var(--delete-color);
     }
 
     .stats {
@@ -240,29 +267,33 @@
 <body>
   <div class="top-bar">
     <h2>Mine mål</h2>
-    <button class="toggle-theme" onclick="toggleTheme()">Skift tema</button>
+    <button class="toggle-theme" onclick="toggleTheme()" aria-label="Skift tema">Skift tema</button>
   </div>
 
   <div class="input-area">
-    <input type="text" id="newItem" placeholder="Skriv et nyt mål..." />
-    <div class="date-wrapper">
-      <span class="date-placeholder" id="datePlaceholder">Vælg deadline</span>
-      <input type="date" id="deadlineInput" />
-    </div>
-    <button onclick="addItem()">➕ Tilføj</button>
+    <input type="text" id="newItem" placeholder="Skriv et nyt mål..." aria-label="Skriv et nyt mål" />
+    <input type="date" id="deadline" aria-label="Vælg deadline" placeholder="Vælg dato" />
+    <button onclick="addItem()" aria-label="Tilføj nyt mål">➕ Tilføj</button>
   </div>
 
   <ul id="list"></ul>
 
-  <div class="stats" id="stats"></div>
+  <div class="stats" id="stats" aria-live="polite"></div>
 
   <script>
+    function formatDate(d) {
+      if (!d) return "";
+      const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+      let dateStr = new Date(d).toLocaleDateString('da-DK', options);
+      return dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+    }
+
     function saveList() {
       const items = [];
       document.querySelectorAll("#list li").forEach(li => {
         items.push({
           text: li.querySelector(".item-text").textContent,
-          date: li.querySelector(".date").textContent.replace("🗓️ ", ""),
+          date: li.querySelector(".date").dataset.rawDate || "",
           done: li.classList.contains("done")
         });
       });
@@ -273,94 +304,109 @@
       const saved = localStorage.getItem("goalList");
       if (saved) {
         const items = JSON.parse(saved);
-        items.forEach(item => addItemToList(item.text, item.date, item.done));
+        items.sort((a,b) => {
+          if (a.date && b.date) return new Date(a.date) - new Date(b.date);
+          if (a.date) return -1;
+          if (b.date) return 1;
+          return 0;
+        });
+        items.forEach(item => addListItem(item.text, item.date, item.done));
       }
-    }
-
-    function toggleItem(li) {
-      li.classList.toggle("done");
-      saveList();
       updateStats();
     }
 
-    function deleteItem(el) {
-      el.parentElement.remove();
+    function addListItem(text, date = "", done = false) {
+      const ul = document.getElementById("list");
+      const li = document.createElement("li");
+      if (done) li.classList.add("done");
+
+      li.innerHTML = `
+        <div class="item-left" tabindex="0" role="checkbox" aria-checked="${done}">
+          <div class="checkbox"></div>
+          <span class="item-text">${text}</span>
+        </div>
+        <div class="date" data-raw-date="${date}">
+          <span class="date-icon" aria-hidden="true">⏳</span>
+          ${date ? formatDate(date) : ""}
+        </div>
+        <div class="delete" role="button" tabindex="0" aria-label="Slet mål">✖️</div>
+      `;
+
+      ul.appendChild(li);
+
+      const itemLeft = li.querySelector(".item-left");
+      const deleteBtn = li.querySelector(".delete");
+
+      itemLeft.addEventListener("click", () => {
+        li.classList.toggle("done");
+        itemLeft.setAttribute("aria-checked", li.classList.contains("done"));
+        saveList();
+        updateStats();
+      });
+      itemLeft.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          itemLeft.click();
+        }
+      });
+
+      deleteBtn.addEventListener("click", () => {
+        li.remove();
+        saveList();
+        updateStats();
+      });
+      deleteBtn.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          deleteBtn.click();
+        }
+      });
+
       saveList();
       updateStats();
     }
 
     function addItem() {
       const input = document.getElementById("newItem");
-      const dateInput = document.getElementById("deadlineInput");
+      const deadlineInput = document.getElementById("deadline");
       const text = input.value.trim();
-      const date = dateInput.value;
+      const date = deadlineInput.value;
 
-      if (text === "") return;
-
-      const dateText = date ? new Date(date).toLocaleDateString("da-DK") : "Ingen deadline";
-
-      addItemToList(text, dateText, false);
+      if (text === "") {
+        alert("Skriv venligst et mål.");
+        input.focus();
+        return;
+      }
+      addListItem(text, date, false);
       input.value = "";
-      dateInput.value = "";
-      toggleDatePlaceholder(); // sørg for placeholder kommer tilbage
-      saveList();
-      updateStats();
-    }
-
-    function addItemToList(text, dateText, done) {
-      const li = document.createElement("li");
-      if (done) li.classList.add("done");
-
-      const checkbox = document.createElement("div");
-      checkbox.className = "checkbox";
-
-      const itemText = document.createElement("div");
-      itemText.className = "item-text";
-      itemText.textContent = text;
-
-      const date = document.createElement("div");
-      date.className = "date";
-      date.textContent = dateText;
-
-      const left = document.createElement("div");
-      left.className = "item-left";
-      left.appendChild(checkbox);
-      left.appendChild(itemText);
-      left.appendChild(date);
-      left.onclick = () => toggleItem(li);
-
-      const del = document.createElement("span");
-      del.className = "delete";
-      del.innerHTML = "🗑️";
-      del.onclick = () => deleteItem(del);
-
-      li.appendChild(left);
-      li.appendChild(del);
-      document.getElementById("list").appendChild(li);
+      deadlineInput.value = "";
+      input.focus();
     }
 
     function updateStats() {
-      const all = document.querySelectorAll("#list li").length;
-      const done = document.querySelectorAll("#list li.done").length;
-      const remaining = all - done;
-      document.getElementById("stats").textContent = `Fuldførte mål: ${done} | Tilbage: ${remaining}`;
+      const ul = document.getElementById("list");
+      const total = ul.children.length;
+      const done = ul.querySelectorAll("li.done").length;
+      const stats = document.getElementById("stats");
+      stats.textContent = `Mål i alt: ${total} - Fuldførte: ${done}`;
     }
 
     function toggleTheme() {
       document.body.classList.toggle("dark");
+      // Gem tema i localStorage
+      if(document.body.classList.contains("dark")) {
+        localStorage.setItem("theme", "dark");
+      } else {
+        localStorage.removeItem("theme");
+      }
     }
 
-    function toggleDatePlaceholder() {
-      const dateInput = document.getElementById("deadlineInput");
-      const placeholder = document.getElementById("datePlaceholder");
-      placeholder.style.display = dateInput.value ? "none" : "block";
+    // Load tema ved start
+    if(localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark");
     }
-
-    document.getElementById("deadlineInput").addEventListener("input", toggleDatePlaceholder);
 
     loadList();
-    updateStats();
-    toggleDatePlaceholder();
   </script>
 </body>
 </html>
