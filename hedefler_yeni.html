@@ -69,33 +69,32 @@
       display: flex;
       align-items: center;
       width: 100%;
+      gap: 10px;
     }
 
-    input[type="text"] {
+    input[type="text"], input[type="date"] {
       padding: 14px;
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 700;
-      flex-grow: 1;
       border: 2px solid var(--button-bg);
       border-radius: 8px;
       transition: border-color 0.3s;
       box-shadow: 0 0 0 1px var(--button-bg);
     }
 
-    input[type="text"]:focus {
+    input[type="text"]:focus, input[type="date"]:focus {
       outline: none;
       border-color: var(--button-bg);
     }
 
     button {
       padding: 14px 28px;
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 700;
       background-color: var(--button-bg);
       color: var(--button-text);
       border: none;
       border-radius: 8px;
-      margin-left: 16px;
       cursor: pointer;
       transition: background-color 0.3s;
       flex-shrink: 0;
@@ -218,6 +217,7 @@
 
   <div class="input-area">
     <input type="text" id="newItem" placeholder="Skriv et nyt mål..." />
+    <input type="date" id="deadline" />
     <button onclick="addItem()">➕ Tilføj</button>
   </div>
 
@@ -226,12 +226,6 @@
   <div class="stats" id="stats"></div>
 
   <script>
-    function formatDate() {
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      let dateStr = new Date().toLocaleDateString('da-DK', options);
-      return dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-    }
-
     function saveList() {
       const items = [];
       document.querySelectorAll("#list li").forEach(li => {
@@ -271,11 +265,19 @@
 
     function addItem() {
       const input = document.getElementById("newItem");
+      const deadlineInput = document.getElementById("deadline");
       const text = input.value.trim();
-      if (text === "") return;
-      const date = formatDate();
-      addItemToList(text, date, false);
+      const deadline = deadlineInput.value;
+
+      if (text === "" || deadline === "") return;
+
+      const deadlineDate = new Date(deadline);
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const formattedDeadline = deadlineDate.toLocaleDateString('da-DK', options);
+
+      addItemToList(text, formattedDeadline, false);
       input.value = "";
+      deadlineInput.value = "";
       saveList();
       updateStats();
     }
