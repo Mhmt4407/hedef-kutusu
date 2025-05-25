@@ -4,10 +4,6 @@
   <meta charset="UTF-8" />
   <title>Mine mål</title>
   <style>
-    html {
-      scroll-behavior: smooth;
-    }
-
     :root {
       --bg-color: #ffffff;
       --text-color: #202020;
@@ -17,10 +13,6 @@
       --delete-color: red;
       --button-bg: #008000;
       --button-text: white;
-      --hover-accent: #006600;
-      --focus-outline: #33aa33;
-      --date-color: #666;
-      --date-icon-color: #888;
     }
 
     body.dark {
@@ -32,10 +24,6 @@
       --delete-color: #ff5555;
       --button-bg: #005500;
       --button-text: #ddffdd;
-      --hover-accent: #009900;
-      --focus-outline: #55ff55;
-      --date-color: #aaa;
-      --date-icon-color: #bbb;
     }
 
     body {
@@ -66,50 +54,61 @@
       font-size: 18px;
       font-weight: 700;
       padding: 8px 16px;
-      border-radius: 12px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s, color 0.3s, box-shadow 0.3s;
-      box-shadow: none;
+      transition: background 0.3s, color 0.3s;
     }
-    .toggle-theme:hover,
-    .toggle-theme:focus {
-      background: var(--hover-accent);
-      color: var(--button-text);
-      outline: none;
-      box-shadow: 0 0 8px var(--hover-accent);
+
+    .toggle-theme:hover {
+      background: var(--text-color);
+      color: var(--bg-color);
     }
 
     .input-area {
       margin-bottom: 30px;
       display: flex;
       align-items: center;
-      width: 100%;
       gap: 12px;
+      width: 100%;
     }
 
-    input[type="text"], input[type="date"] {
-      padding: 18px;
+    input[type="text"] {
+      padding: 14px;
       font-size: 24px;
       font-weight: 700;
+      flex-grow: 2;
       border: 2px solid var(--button-bg);
-      border-radius: 12px;
-      transition: border-color 0.3s, box-shadow 0.3s;
+      border-radius: 8px;
+      transition: border-color 0.3s;
       box-shadow: 0 0 0 1px var(--button-bg);
-      flex-grow: 1;
     }
-    input[type="text"]:focus, input[type="date"]:focus {
+
+    input[type="number"] {
+      padding: 14px;
+      font-size: 20px;
+      font-weight: 700;
+      width: 120px;
+      border: 2px solid var(--button-bg);
+      border-radius: 8px;
+      transition: border-color 0.3s;
+      box-shadow: 0 0 0 1px var(--button-bg);
+      color: var(--text-color);
+      background: var(--bg-color);
+    }
+
+    input[type="number"]::placeholder {
+      color: #999;
+    }
+
+    body.dark input[type="number"] {
+      background: var(--item-bg);
+      color: var(--text-color);
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus {
       outline: none;
-      border-color: var(--hover-accent);
-      box-shadow: 0 0 8px var(--hover-accent);
-    }
-    input[type="date"] {
-      max-width: 180px;
-      color: var(--text-color);
-      background-color: var(--item-bg);
-    }
-    body.dark input[type="date"] {
-      background-color: var(--item-bg);
-      color: var(--text-color);
+      border-color: var(--button-bg);
     }
 
     button {
@@ -119,25 +118,17 @@
       background-color: var(--button-bg);
       color: var(--button-text);
       border: none;
-      border-radius: 12px;
-      margin-left: 0;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s, box-shadow 0.3s;
+      transition: background-color 0.3s;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       gap: 10px;
-      box-shadow: 0 4px 8px rgba(0, 128, 0, 0.4);
-      user-select: none;
     }
-    button:hover, button:focus {
-      background-color: var(--hover-accent);
-      box-shadow: 0 6px 12px rgba(0, 153, 0, 0.6);
-      outline: none;
-    }
-    button:active {
-      transform: scale(0.97);
-      transition: transform 0.1s;
+
+    button:hover {
+      background-color: #005500cc;
     }
 
     ul {
@@ -153,14 +144,10 @@
       align-items: center;
       justify-content: space-between;
       background: var(--item-bg);
-      border-radius: 12px;
+      border-radius: 8px;
       padding: 14px 20px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-      transition: background 0.3s, box-shadow 0.3s;
-      user-select: none;
-    }
-    li:hover {
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: background 0.3s;
     }
 
     .item-left {
@@ -176,32 +163,28 @@
       width: 28px;
       height: 28px;
       border: 2.5px solid var(--checkbox-border);
-      border-radius: 8px;
+      border-radius: 6px;
       position: relative;
-      transition: border-color 0.3s, background-color 0.3s;
+      transition: border-color 0.3s;
       flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
-    .checkbox::after {
-      content: "";
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      font-size: 22px;
-      font-weight: 900;
-      color: white;
-      user-select: none;
-    }
+
     .done .checkbox {
       border-color: var(--checkbox-check);
       background-color: var(--checkbox-check);
     }
+
     .done .checkbox::after {
       content: "✔";
-      opacity: 1;
+      position: absolute;
+      top: 1px;
+      left: 6px;
+      color: white;
+      font-size: 22px;
+      font-weight: 900;
       animation: checkFade 0.4s ease forwards;
     }
+
     @keyframes checkFade {
       from {opacity: 0; transform: scale(0.7) rotate(-45deg);}
       to {opacity: 1; transform: scale(1) rotate(0deg);}
@@ -210,7 +193,6 @@
     .done .item-text {
       color: var(--checkbox-check);
       text-decoration: line-through;
-      transition: color 0.3s;
     }
 
     .item-text {
@@ -220,22 +202,21 @@
       transition: color 0.3s;
     }
 
-    .date {
+    .deadline {
       font-size: 18px;
-      color: var(--date-color);
+      color: #666;
       font-weight: 700;
       white-space: nowrap;
       user-select: none;
       display: flex;
       align-items: center;
       gap: 6px;
-      flex-shrink: 0;
+      min-width: 160px;
+      justify-content: flex-end;
     }
-    .date-icon {
-      font-size: 18px;
-      color: var(--date-icon-color);
-      user-select: none;
-      display: inline-block;
+
+    body.dark .deadline {
+      color: #bbb;
     }
 
     .delete {
@@ -245,13 +226,10 @@
       margin-left: 24px;
       user-select: none;
       transition: color 0.3s;
-      flex-shrink: 0;
     }
-    .delete:hover,
-    .delete:focus {
+
+    .delete:hover {
       color: #ff0000cc;
-      outline: none;
-      text-shadow: 0 0 4px var(--delete-color);
     }
 
     .stats {
@@ -267,33 +245,32 @@
 <body>
   <div class="top-bar">
     <h2>Mine mål</h2>
-    <button class="toggle-theme" onclick="toggleTheme()" aria-label="Skift tema">Skift tema</button>
+    <button class="toggle-theme" onclick="toggleTheme()">Skift tema</button>
   </div>
 
   <div class="input-area">
-    <input type="text" id="newItem" placeholder="Skriv et nyt mål..." aria-label="Skriv et nyt mål" />
-    <input type="date" id="deadline" aria-label="Vælg deadline" placeholder="Vælg dato" />
-    <button onclick="addItem()" aria-label="Tilføj nyt mål">➕ Tilføj</button>
+    <input type="text" id="newItem" placeholder="Skriv et nyt mål..." />
+    <input type="number" id="deadlineDays" placeholder="Vælg antal dage" min="1" />
+    <button onclick="addItem()">➕ Tilføj</button>
   </div>
 
   <ul id="list"></ul>
 
-  <div class="stats" id="stats" aria-live="polite"></div>
+  <div class="stats" id="stats"></div>
 
   <script>
-    function formatDate(d) {
-      if (!d) return "";
-      const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
-      let dateStr = new Date(d).toLocaleDateString('da-DK', options);
-      return dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-    }
+    const TIMEGLASS_SVG = `
+      <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#666">
+        <path d="M6 2v6h.01L6 8v2l3 3-3 3v2h.01V22h12v-6h-.01L18 14v-2l-3-3 3-3V6h-.01V2H6zm10 16H8v-1.17l2.59-2.59L8 11.66V10h8v8z"/>
+      </svg>`;
 
     function saveList() {
       const items = [];
       document.querySelectorAll("#list li").forEach(li => {
         items.push({
           text: li.querySelector(".item-text").textContent,
-          date: li.querySelector(".date").dataset.rawDate || "",
+          created: li.dataset.created,
+          deadlineDays: li.dataset.deadlineDays,
           done: li.classList.contains("done")
         });
       });
@@ -304,96 +281,119 @@
       const saved = localStorage.getItem("goalList");
       if (saved) {
         const items = JSON.parse(saved);
+        // Sort by closest deadline first (fewest days left)
         items.sort((a,b) => {
-          if (a.date && b.date) return new Date(a.date) - new Date(b.date);
-          if (a.date) return -1;
-          if (b.date) return 1;
-          return 0;
+          const daysLeftA = calculateDaysLeft(a.created, a.deadlineDays);
+          const daysLeftB = calculateDaysLeft(b.created, b.deadlineDays);
+          return daysLeftA - daysLeftB;
         });
-        items.forEach(item => addListItem(item.text, item.date, item.done));
+        items.forEach(item => addItemToList(item.text, item.created, item.deadlineDays, item.done));
       }
-      updateStats();
     }
 
-    function addListItem(text, date = "", done = false) {
-      const ul = document.getElementById("list");
+    function calculateDaysLeft(createdDateStr, deadlineDaysStr) {
+      const createdDate = new Date(createdDateStr);
+      const deadlineDays = parseInt(deadlineDaysStr, 10);
+      const now = new Date();
+      // difference in ms
+      const diffMs = createdDate.getTime() + deadlineDays * 24*60*60*1000 - now.getTime();
+      // convert to full days left (round up so 1.1 days left => 2 days shown)
+      return Math.max(0, Math.ceil(diffMs / (1000*60*60*24)));
+    }
+
+    function addItemToList(text, createdDate = null, deadlineDays = null, done = false) {
+      if (!createdDate) createdDate = new Date().toISOString();
+      if (!deadlineDays) deadlineDays = "7";
+
       const li = document.createElement("li");
+      li.dataset.created = createdDate;
+      li.dataset.deadlineDays = deadlineDays;
       if (done) li.classList.add("done");
 
-      li.innerHTML = `
-        <div class="item-left" tabindex="0" role="checkbox" aria-checked="${done}">
-          <div class="checkbox"></div>
-          <span class="item-text">${text}</span>
-        </div>
-        <div class="date" data-raw-date="${date}">
-          <span class="date-icon" aria-hidden="true">⏳</span>
-          ${date ? formatDate(date) : ""}
-        </div>
-        <div class="delete" role="button" tabindex="0" aria-label="Slet mål">✖️</div>
-      `;
+      const leftDiv = document.createElement("div");
+      leftDiv.className = "item-left";
 
-      ul.appendChild(li);
+      // Checkbox box
+      const checkbox = document.createElement("div");
+      checkbox.className = "checkbox";
+      leftDiv.appendChild(checkbox);
 
-      const itemLeft = li.querySelector(".item-left");
-      const deleteBtn = li.querySelector(".delete");
+      // Text
+      const spanText = document.createElement("span");
+      spanText.className = "item-text";
+      spanText.textContent = text;
+      leftDiv.appendChild(spanText);
 
-      itemLeft.addEventListener("click", () => {
+      leftDiv.addEventListener("click", () => {
         li.classList.toggle("done");
-        itemLeft.setAttribute("aria-checked", li.classList.contains("done"));
         saveList();
         updateStats();
       });
-      itemLeft.addEventListener("keydown", e => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          itemLeft.click();
-        }
-      });
 
-      deleteBtn.addEventListener("click", () => {
+      li.appendChild(leftDiv);
+
+      // Deadline display with timeglass icon and days left
+      const deadlineDiv = document.createElement("div");
+      deadlineDiv.className = "deadline";
+      deadlineDiv.innerHTML = TIMEGLASS_SVG + " ";
+
+      const daysLeft = calculateDaysLeft(createdDate, deadlineDays);
+      if (daysLeft === 0) {
+        deadlineDiv.innerHTML += `<span style="color:#d22; font-weight:800;">Deadline overskredet!</span>`;
+      } else {
+        deadlineDiv.innerHTML += `<span>${daysLeft} dage tilbage</span>`;
+      }
+      li.appendChild(deadlineDiv);
+
+      // Delete button (trash icon)
+      const deleteBtn = document.createElement("div");
+      deleteBtn.className = "delete";
+      deleteBtn.title = "Slet mål";
+      deleteBtn.textContent = "🗑️";
+      deleteBtn.addEventListener("click", e => {
+        e.stopPropagation();
         li.remove();
         saveList();
         updateStats();
       });
-      deleteBtn.addEventListener("keydown", e => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          deleteBtn.click();
-        }
-      });
+      li.appendChild(deleteBtn);
 
+      document.getElementById("list").appendChild(li);
       saveList();
       updateStats();
     }
 
     function addItem() {
-      const input = document.getElementById("newItem");
-      const deadlineInput = document.getElementById("deadline");
-      const text = input.value.trim();
-      const date = deadlineInput.value;
+      const textInput = document.getElementById("newItem");
+      const daysInput = document.getElementById("deadlineDays");
+      const text = textInput.value.trim();
+      const days = daysInput.value.trim();
 
-      if (text === "") {
+      if (!text) {
         alert("Skriv venligst et mål.");
-        input.focus();
         return;
       }
-      addListItem(text, date, false);
-      input.value = "";
-      deadlineInput.value = "";
-      input.focus();
+      if (!days || isNaN(days) || days <= 0) {
+        alert("Vælg venligst et gyldigt antal dage til deadline.");
+        return;
+      }
+
+      addItemToList(text, null, days, false);
+      textInput.value = "";
+      daysInput.value = "";
+      textInput.focus();
     }
 
     function updateStats() {
-      const ul = document.getElementById("list");
-      const total = ul.children.length;
-      const done = ul.querySelectorAll("li.done").length;
-      const stats = document.getElementById("stats");
-      stats.textContent = `Mål i alt: ${total} - Fuldførte: ${done}`;
+      const listItems = document.querySelectorAll("#list li");
+      const total = listItems.length;
+      const done = [...listItems].filter(li => li.classList.contains("done")).length;
+      document.getElementById("stats").textContent = `Mål: ${total} | Fuldførte: ${done}`;
     }
 
     function toggleTheme() {
       document.body.classList.toggle("dark");
-      // Gem tema i localStorage
+      // gem tema i localStorage
       if(document.body.classList.contains("dark")) {
         localStorage.setItem("theme", "dark");
       } else {
@@ -401,12 +401,14 @@
       }
     }
 
-    // Load tema ved start
-    if(localStorage.getItem("theme") === "dark") {
-      document.body.classList.add("dark");
-    }
-
-    loadList();
+    // Load theme and list on startup
+    window.onload = () => {
+      if(localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark");
+      }
+      loadList();
+      updateStats();
+    };
   </script>
 </body>
 </html>
