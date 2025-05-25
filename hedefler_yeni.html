@@ -14,7 +14,6 @@
       --button-bg: #008000;
       --button-text: white;
       --input-bg: #ffffff;
-      --input-text: #202020;
     }
 
     body.dark {
@@ -27,7 +26,6 @@
       --button-bg: #005500;
       --button-text: #ddffdd;
       --input-bg: #2a2a2a;
-      --input-text: #ffffff;
     }
 
     body {
@@ -72,40 +70,60 @@
       margin-bottom: 30px;
       display: flex;
       align-items: center;
-      width: 100%;
       gap: 10px;
       flex-wrap: wrap;
     }
 
-    input[type="text"], input[type="date"] {
-      padding: 16px;
-      font-size: 22px;
+    input[type="text"] {
+      padding: 14px;
+      font-size: 24px;
       font-weight: 700;
+      flex-grow: 1;
+      min-width: 300px;
       border: 2px solid var(--button-bg);
       border-radius: 8px;
-      background-color: var(--input-bg);
-      color: var(--input-text);
-      transition: border-color 0.3s, background-color 0.3s;
-      box-shadow: 0 0 0 1px var(--button-bg);
+      background: var(--input-bg);
+      color: var(--text-color);
+      transition: border-color 0.3s;
     }
 
-    input[type="text"] {
-      flex-grow: 1;
-      min-width: 250px;
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--button-bg);
+    }
+
+    .date-wrapper {
+      position: relative;
+    }
+
+    .date-placeholder {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+      pointer-events: none;
+      font-size: 18px;
     }
 
     input[type="date"] {
-      font-size: 20px;
+      padding: 12px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: 2px solid var(--button-bg);
+      background: var(--input-bg);
+      color: var(--text-color);
+      transition: border-color 0.3s;
     }
 
-    input[type="text"]:focus, input[type="date"]:focus {
+    input[type="date"]:focus {
       outline: none;
       border-color: var(--button-bg);
     }
 
     button {
-      padding: 14px 28px;
-      font-size: 24px;
+      padding: 14px 20px;
+      font-size: 20px;
       font-weight: 700;
       background-color: var(--button-bg);
       color: var(--button-text);
@@ -113,6 +131,7 @@
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -138,7 +157,6 @@
       border-radius: 8px;
       padding: 14px 20px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      transition: background 0.3s;
     }
 
     .item-left {
@@ -148,7 +166,6 @@
       gap: 16px;
       cursor: pointer;
       user-select: none;
-      flex-wrap: wrap;
     }
 
     .checkbox {
@@ -157,8 +174,6 @@
       border: 2.5px solid var(--checkbox-border);
       border-radius: 6px;
       position: relative;
-      transition: border-color 0.3s;
-      flex-shrink: 0;
     }
 
     .done .checkbox {
@@ -174,12 +189,6 @@
       color: white;
       font-size: 22px;
       font-weight: 900;
-      animation: checkFade 0.4s ease forwards;
-    }
-
-    @keyframes checkFade {
-      from {opacity: 0; transform: scale(0.7) rotate(-45deg);}
-      to {opacity: 1; transform: scale(1) rotate(0deg);}
     }
 
     .done .item-text {
@@ -191,22 +200,19 @@
       flex-grow: 1;
       font-weight: 700;
       color: var(--text-color);
-      transition: color 0.3s;
     }
 
     .date {
       font-size: 18px;
       color: #666;
       font-weight: 700;
-      white-space: nowrap;
-      user-select: none;
       display: flex;
       align-items: center;
       gap: 6px;
     }
 
     .date::before {
-      content: "⏳";
+      content: "🗓️";
     }
 
     .delete {
@@ -215,7 +221,6 @@
       cursor: pointer;
       margin-left: 24px;
       user-select: none;
-      transition: color 0.3s;
     }
 
     .delete:hover {
@@ -240,7 +245,10 @@
 
   <div class="input-area">
     <input type="text" id="newItem" placeholder="Skriv et nyt mål..." />
-    <input type="date" id="deadline" />
+    <div class="date-wrapper">
+      <span class="date-placeholder" id="datePlaceholder">Vælg deadline</span>
+      <input type="date" id="deadlineInput" />
+    </div>
     <button onclick="addItem()">➕ Tilføj</button>
   </div>
 
@@ -254,7 +262,7 @@
       document.querySelectorAll("#list li").forEach(li => {
         items.push({
           text: li.querySelector(".item-text").textContent,
-          date: li.querySelector(".date").getAttribute("data-date"),
+          date: li.querySelector(".date").textContent.replace("🗓️ ", ""),
           done: li.classList.contains("done")
         });
       });
@@ -265,16 +273,8 @@
       const saved = localStorage.getItem("goalList");
       if (saved) {
         const items = JSON.parse(saved);
-        items.sort((a, b) => new Date(a.date) - new Date(b.date));
         items.forEach(item => addItemToList(item.text, item.date, item.done));
       }
-    }
-
-    function formatDate(dateStr) {
-      const date = new Date(dateStr);
-      return date.toLocaleDateString('da-DK', {
-        weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
-      });
     }
 
     function toggleItem(li) {
@@ -291,20 +291,23 @@
 
     function addItem() {
       const input = document.getElementById("newItem");
-      const deadlineInput = document.getElementById("deadline");
+      const dateInput = document.getElementById("deadlineInput");
       const text = input.value.trim();
-      const date = deadlineInput.value;
+      const date = dateInput.value;
 
-      if (text === "" || date === "") return;
+      if (text === "") return;
 
-      addItemToList(text, date, false);
+      const dateText = date ? new Date(date).toLocaleDateString("da-DK") : "Ingen deadline";
+
+      addItemToList(text, dateText, false);
       input.value = "";
-      deadlineInput.value = "";
+      dateInput.value = "";
+      toggleDatePlaceholder(); // sørg for placeholder kommer tilbage
       saveList();
       updateStats();
     }
 
-    function addItemToList(text, dateISO, done) {
+    function addItemToList(text, dateText, done) {
       const li = document.createElement("li");
       if (done) li.classList.add("done");
 
@@ -317,8 +320,7 @@
 
       const date = document.createElement("div");
       date.className = "date";
-      date.setAttribute("data-date", dateISO);
-      date.textContent = formatDate(dateISO);
+      date.textContent = dateText;
 
       const left = document.createElement("div");
       left.className = "item-left";
@@ -348,8 +350,17 @@
       document.body.classList.toggle("dark");
     }
 
+    function toggleDatePlaceholder() {
+      const dateInput = document.getElementById("deadlineInput");
+      const placeholder = document.getElementById("datePlaceholder");
+      placeholder.style.display = dateInput.value ? "none" : "block";
+    }
+
+    document.getElementById("deadlineInput").addEventListener("input", toggleDatePlaceholder);
+
     loadList();
     updateStats();
+    toggleDatePlaceholder();
   </script>
 </body>
 </html>
