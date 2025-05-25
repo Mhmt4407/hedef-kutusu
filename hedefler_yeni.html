@@ -80,6 +80,7 @@
       font-weight: 700;
       flex-grow: 1;
       min-width: 300px;
+      height: 56px;
       border: 2px solid var(--button-bg);
       border-radius: 8px;
       background: var(--input-bg);
@@ -94,6 +95,7 @@
 
     .date-wrapper {
       position: relative;
+      height: 56px;
     }
 
     .date-placeholder {
@@ -104,18 +106,18 @@
       color: #888;
       pointer-events: none;
       font-size: 18px;
-      cursor: pointer; /* så det føles klikbart */
-      user-select: none;
     }
 
     input[type="date"] {
-      padding: 12px;
+      padding: 14px 12px;
       font-size: 18px;
       border-radius: 8px;
       border: 2px solid var(--button-bg);
       background: var(--input-bg);
       color: var(--text-color);
       transition: border-color 0.3s;
+      height: 100%;
+      box-sizing: border-box;
     }
 
     input[type="date"]:focus {
@@ -137,6 +139,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      height: 56px;
     }
 
     button:hover {
@@ -304,7 +307,7 @@
       addItemToList(text, dateText, false);
       input.value = "";
       dateInput.value = "";
-      toggleDatePlaceholder(); // sørg for placeholder kommer tilbage
+      toggleDatePlaceholder();
       saveList();
       updateStats();
     }
@@ -359,11 +362,6 @@
     }
 
     document.getElementById("deadlineInput").addEventListener("input", toggleDatePlaceholder);
-
-    // Her tilføjes fokus på input, når placeholderen klikkes
-    document.getElementById("datePlaceholder").addEventListener("click", () => {
-      document.getElementById("deadlineInput").focus();
-    });
 
     loadList();
     updateStats();
