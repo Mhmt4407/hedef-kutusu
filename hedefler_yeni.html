@@ -13,6 +13,7 @@
       --delete-color: red;
       --button-bg: #008000;
       --button-text: white;
+      --input-bg: #ffffff;
     }
 
     body.dark {
@@ -24,6 +25,7 @@
       --delete-color: #ff5555;
       --button-bg: #005500;
       --button-text: #ddffdd;
+      --input-bg: #2a2a2a;
     }
 
     body {
@@ -68,52 +70,62 @@
       margin-bottom: 30px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      width: 100%;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     input[type="text"] {
       padding: 14px;
       font-size: 24px;
       font-weight: 700;
-      flex-grow: 2;
+      flex-grow: 1;
+      min-width: 300px;
       border: 2px solid var(--button-bg);
       border-radius: 8px;
+      background: var(--input-bg);
+      color: var(--text-color);
       transition: border-color 0.3s;
-      box-shadow: 0 0 0 1px var(--button-bg);
     }
 
-    input[type="number"] {
-      padding: 14px;
-      font-size: 20px;
-      font-weight: 700;
-      width: 120px;
-      border: 2px solid var(--button-bg);
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--button-bg);
+    }
+
+    .date-wrapper {
+      position: relative;
+    }
+
+    .date-placeholder {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+      pointer-events: none;
+      font-size: 18px;
+      cursor: pointer; /* så det føles klikbart */
+      user-select: none;
+    }
+
+    input[type="date"] {
+      padding: 12px;
+      font-size: 18px;
       border-radius: 8px;
+      border: 2px solid var(--button-bg);
+      background: var(--input-bg);
+      color: var(--text-color);
       transition: border-color 0.3s;
-      box-shadow: 0 0 0 1px var(--button-bg);
-      color: var(--text-color);
-      background: var(--bg-color);
     }
 
-    input[type="number"]::placeholder {
-      color: #999;
-    }
-
-    body.dark input[type="number"] {
-      background: var(--item-bg);
-      color: var(--text-color);
-    }
-
-    input[type="text"]:focus,
-    input[type="number"]:focus {
+    input[type="date"]:focus {
       outline: none;
       border-color: var(--button-bg);
     }
 
     button {
-      padding: 14px 28px;
-      font-size: 24px;
+      padding: 14px 20px;
+      font-size: 20px;
       font-weight: 700;
       background-color: var(--button-bg);
       color: var(--button-text);
@@ -147,7 +159,6 @@
       border-radius: 8px;
       padding: 14px 20px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      transition: background 0.3s;
     }
 
     .item-left {
@@ -165,8 +176,6 @@
       border: 2.5px solid var(--checkbox-border);
       border-radius: 6px;
       position: relative;
-      transition: border-color 0.3s;
-      flex-shrink: 0;
     }
 
     .done .checkbox {
@@ -182,12 +191,6 @@
       color: white;
       font-size: 22px;
       font-weight: 900;
-      animation: checkFade 0.4s ease forwards;
-    }
-
-    @keyframes checkFade {
-      from {opacity: 0; transform: scale(0.7) rotate(-45deg);}
-      to {opacity: 1; transform: scale(1) rotate(0deg);}
     }
 
     .done .item-text {
@@ -199,24 +202,19 @@
       flex-grow: 1;
       font-weight: 700;
       color: var(--text-color);
-      transition: color 0.3s;
     }
 
-    .deadline {
+    .date {
       font-size: 18px;
       color: #666;
       font-weight: 700;
-      white-space: nowrap;
-      user-select: none;
       display: flex;
       align-items: center;
       gap: 6px;
-      min-width: 160px;
-      justify-content: flex-end;
     }
 
-    body.dark .deadline {
-      color: #bbb;
+    .date::before {
+      content: "🗓️";
     }
 
     .delete {
@@ -225,7 +223,6 @@
       cursor: pointer;
       margin-left: 24px;
       user-select: none;
-      transition: color 0.3s;
     }
 
     .delete:hover {
@@ -250,7 +247,10 @@
 
   <div class="input-area">
     <input type="text" id="newItem" placeholder="Skriv et nyt mål..." />
-    <input type="number" id="deadlineDays" placeholder="Vælg antal dage" min="1" />
+    <div class="date-wrapper">
+      <span class="date-placeholder" id="datePlaceholder">Vælg deadline</span>
+      <input type="date" id="deadlineInput" />
+    </div>
     <button onclick="addItem()">➕ Tilføj</button>
   </div>
 
@@ -259,18 +259,12 @@
   <div class="stats" id="stats"></div>
 
   <script>
-    const TIMEGLASS_SVG = `
-      <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#666">
-        <path d="M6 2v6h.01L6 8v2l3 3-3 3v2h.01V22h12v-6h-.01L18 14v-2l-3-3 3-3V6h-.01V2H6zm10 16H8v-1.17l2.59-2.59L8 11.66V10h8v8z"/>
-      </svg>`;
-
     function saveList() {
       const items = [];
       document.querySelectorAll("#list li").forEach(li => {
         items.push({
           text: li.querySelector(".item-text").textContent,
-          created: li.dataset.created,
-          deadlineDays: li.dataset.deadlineDays,
+          date: li.querySelector(".date").textContent.replace("🗓️ ", ""),
           done: li.classList.contains("done")
         });
       });
@@ -281,134 +275,99 @@
       const saved = localStorage.getItem("goalList");
       if (saved) {
         const items = JSON.parse(saved);
-        // Sort by closest deadline first (fewest days left)
-        items.sort((a,b) => {
-          const daysLeftA = calculateDaysLeft(a.created, a.deadlineDays);
-          const daysLeftB = calculateDaysLeft(b.created, b.deadlineDays);
-          return daysLeftA - daysLeftB;
-        });
-        items.forEach(item => addItemToList(item.text, item.created, item.deadlineDays, item.done));
+        items.forEach(item => addItemToList(item.text, item.date, item.done));
       }
     }
 
-    function calculateDaysLeft(createdDateStr, deadlineDaysStr) {
-      const createdDate = new Date(createdDateStr);
-      const deadlineDays = parseInt(deadlineDaysStr, 10);
-      const now = new Date();
-      // difference in ms
-      const diffMs = createdDate.getTime() + deadlineDays * 24*60*60*1000 - now.getTime();
-      // convert to full days left (round up so 1.1 days left => 2 days shown)
-      return Math.max(0, Math.ceil(diffMs / (1000*60*60*24)));
+    function toggleItem(li) {
+      li.classList.toggle("done");
+      saveList();
+      updateStats();
     }
 
-    function addItemToList(text, createdDate = null, deadlineDays = null, done = false) {
-      if (!createdDate) createdDate = new Date().toISOString();
-      if (!deadlineDays) deadlineDays = "7";
-
-      const li = document.createElement("li");
-      li.dataset.created = createdDate;
-      li.dataset.deadlineDays = deadlineDays;
-      if (done) li.classList.add("done");
-
-      const leftDiv = document.createElement("div");
-      leftDiv.className = "item-left";
-
-      // Checkbox box
-      const checkbox = document.createElement("div");
-      checkbox.className = "checkbox";
-      leftDiv.appendChild(checkbox);
-
-      // Text
-      const spanText = document.createElement("span");
-      spanText.className = "item-text";
-      spanText.textContent = text;
-      leftDiv.appendChild(spanText);
-
-      leftDiv.addEventListener("click", () => {
-        li.classList.toggle("done");
-        saveList();
-        updateStats();
-      });
-
-      li.appendChild(leftDiv);
-
-      // Deadline display with timeglass icon and days left
-      const deadlineDiv = document.createElement("div");
-      deadlineDiv.className = "deadline";
-      deadlineDiv.innerHTML = TIMEGLASS_SVG + " ";
-
-      const daysLeft = calculateDaysLeft(createdDate, deadlineDays);
-      if (daysLeft === 0) {
-        deadlineDiv.innerHTML += `<span style="color:#d22; font-weight:800;">Deadline overskredet!</span>`;
-      } else {
-        deadlineDiv.innerHTML += `<span>${daysLeft} dage tilbage</span>`;
-      }
-      li.appendChild(deadlineDiv);
-
-      // Delete button (trash icon)
-      const deleteBtn = document.createElement("div");
-      deleteBtn.className = "delete";
-      deleteBtn.title = "Slet mål";
-      deleteBtn.textContent = "🗑️";
-      deleteBtn.addEventListener("click", e => {
-        e.stopPropagation();
-        li.remove();
-        saveList();
-        updateStats();
-      });
-      li.appendChild(deleteBtn);
-
-      document.getElementById("list").appendChild(li);
+    function deleteItem(el) {
+      el.parentElement.remove();
       saveList();
       updateStats();
     }
 
     function addItem() {
-      const textInput = document.getElementById("newItem");
-      const daysInput = document.getElementById("deadlineDays");
-      const text = textInput.value.trim();
-      const days = daysInput.value.trim();
+      const input = document.getElementById("newItem");
+      const dateInput = document.getElementById("deadlineInput");
+      const text = input.value.trim();
+      const date = dateInput.value;
 
-      if (!text) {
-        alert("Skriv venligst et mål.");
-        return;
-      }
-      if (!days || isNaN(days) || days <= 0) {
-        alert("Vælg venligst et gyldigt antal dage til deadline.");
-        return;
-      }
+      if (text === "") return;
 
-      addItemToList(text, null, days, false);
-      textInput.value = "";
-      daysInput.value = "";
-      textInput.focus();
+      const dateText = date ? new Date(date).toLocaleDateString("da-DK") : "Ingen deadline";
+
+      addItemToList(text, dateText, false);
+      input.value = "";
+      dateInput.value = "";
+      toggleDatePlaceholder(); // sørg for placeholder kommer tilbage
+      saveList();
+      updateStats();
+    }
+
+    function addItemToList(text, dateText, done) {
+      const li = document.createElement("li");
+      if (done) li.classList.add("done");
+
+      const checkbox = document.createElement("div");
+      checkbox.className = "checkbox";
+
+      const itemText = document.createElement("div");
+      itemText.className = "item-text";
+      itemText.textContent = text;
+
+      const date = document.createElement("div");
+      date.className = "date";
+      date.textContent = dateText;
+
+      const left = document.createElement("div");
+      left.className = "item-left";
+      left.appendChild(checkbox);
+      left.appendChild(itemText);
+      left.appendChild(date);
+      left.onclick = () => toggleItem(li);
+
+      const del = document.createElement("span");
+      del.className = "delete";
+      del.innerHTML = "🗑️";
+      del.onclick = () => deleteItem(del);
+
+      li.appendChild(left);
+      li.appendChild(del);
+      document.getElementById("list").appendChild(li);
     }
 
     function updateStats() {
-      const listItems = document.querySelectorAll("#list li");
-      const total = listItems.length;
-      const done = [...listItems].filter(li => li.classList.contains("done")).length;
-      document.getElementById("stats").textContent = `Mål: ${total} | Fuldførte: ${done}`;
+      const all = document.querySelectorAll("#list li").length;
+      const done = document.querySelectorAll("#list li.done").length;
+      const remaining = all - done;
+      document.getElementById("stats").textContent = `Fuldførte mål: ${done} | Tilbage: ${remaining}`;
     }
 
     function toggleTheme() {
       document.body.classList.toggle("dark");
-      // gem tema i localStorage
-      if(document.body.classList.contains("dark")) {
-        localStorage.setItem("theme", "dark");
-      } else {
-        localStorage.removeItem("theme");
-      }
     }
 
-    // Load theme and list on startup
-    window.onload = () => {
-      if(localStorage.getItem("theme") === "dark") {
-        document.body.classList.add("dark");
-      }
-      loadList();
-      updateStats();
-    };
+    function toggleDatePlaceholder() {
+      const dateInput = document.getElementById("deadlineInput");
+      const placeholder = document.getElementById("datePlaceholder");
+      placeholder.style.display = dateInput.value ? "none" : "block";
+    }
+
+    document.getElementById("deadlineInput").addEventListener("input", toggleDatePlaceholder);
+
+    // Her tilføjes fokus på input, når placeholderen klikkes
+    document.getElementById("datePlaceholder").addEventListener("click", () => {
+      document.getElementById("deadlineInput").focus();
+    });
+
+    loadList();
+    updateStats();
+    toggleDatePlaceholder();
   </script>
 </body>
 </html>
