@@ -13,6 +13,8 @@
       --delete-color: red;
       --button-bg: #008000;
       --button-text: white;
+      --input-bg: #ffffff;
+      --input-text: #202020;
     }
 
     body.dark {
@@ -24,6 +26,8 @@
       --delete-color: #ff5555;
       --button-bg: #005500;
       --button-text: #ddffdd;
+      --input-bg: #2a2a2a;
+      --input-text: #ffffff;
     }
 
     body {
@@ -68,35 +72,35 @@
       margin-bottom: 30px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      width: 100%;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
-    input[type="text"] {
-      padding: 18px;
-      font-size: 24px;
+    input[type="text"], input[type="date"] {
+      padding: 16px;
+      font-size: 22px;
       font-weight: 700;
-      flex-grow: 1;
-      min-width: 250px;
       border: 2px solid var(--button-bg);
       border-radius: 8px;
-      transition: border-color 0.3s;
+      background-color: var(--input-bg);
+      color: var(--input-text);
+      transition: border-color 0.3s, background-color 0.3s;
       box-shadow: 0 0 0 1px var(--button-bg);
     }
 
-    input[type="text"]:focus {
-      outline: none;
-      border-color: var(--button-bg);
+    input[type="text"] {
+      flex-grow: 1;
+      min-width: 250px;
     }
 
     input[type="date"] {
-      padding: 14px;
-      font-size: 18px;
-      font-weight: 600;
-      border-radius: 8px;
-      border: 2px solid var(--button-bg);
-      background: var(--bg-color);
-      color: var(--text-color);
+      font-size: 20px;
+    }
+
+    input[type="text"]:focus, input[type="date"]:focus {
+      outline: none;
+      border-color: var(--button-bg);
     }
 
     button {
@@ -144,6 +148,7 @@
       gap: 16px;
       cursor: pointer;
       user-select: none;
+      flex-wrap: wrap;
     }
 
     .checkbox {
@@ -195,6 +200,13 @@
       font-weight: 700;
       white-space: nowrap;
       user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .date::before {
+      content: "⏳";
     }
 
     .delete {
@@ -228,7 +240,7 @@
 
   <div class="input-area">
     <input type="text" id="newItem" placeholder="Skriv et nyt mål..." />
-    <input type="date" id="deadlineDate" />
+    <input type="date" id="deadline" />
     <button onclick="addItem()">➕ Tilføj</button>
   </div>
 
@@ -253,9 +265,16 @@
       const saved = localStorage.getItem("goalList");
       if (saved) {
         const items = JSON.parse(saved);
-        items.sort((a,b) => new Date(a.date) - new Date(b.date));
+        items.sort((a, b) => new Date(a.date) - new Date(b.date));
         items.forEach(item => addItemToList(item.text, item.date, item.done));
       }
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('da-DK', {
+        weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+      });
     }
 
     function toggleItem(li) {
@@ -272,18 +291,20 @@
 
     function addItem() {
       const input = document.getElementById("newItem");
-      const dateInput = document.getElementById("deadlineDate");
+      const deadlineInput = document.getElementById("deadline");
       const text = input.value.trim();
-      const dateVal = dateInput.value;
-      if (text === "" || dateVal === "") return;
-      addItemToList(text, dateVal, false);
+      const date = deadlineInput.value;
+
+      if (text === "" || date === "") return;
+
+      addItemToList(text, date, false);
       input.value = "";
-      dateInput.value = "";
+      deadlineInput.value = "";
       saveList();
       updateStats();
     }
 
-    function addItemToList(text, dateVal, done) {
+    function addItemToList(text, dateISO, done) {
       const li = document.createElement("li");
       if (done) li.classList.add("done");
 
@@ -296,11 +317,8 @@
 
       const date = document.createElement("div");
       date.className = "date";
-      date.setAttribute("data-date", dateVal);
-      const formatted = new Date(dateVal).toLocaleDateString("da-DK", {
-        weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
-      });
-      date.textContent = "⏳ " + formatted;
+      date.setAttribute("data-date", dateISO);
+      date.textContent = formatDate(dateISO);
 
       const left = document.createElement("div");
       left.className = "item-left";
