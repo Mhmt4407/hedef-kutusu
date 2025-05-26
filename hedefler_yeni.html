@@ -59,7 +59,6 @@
       border-radius: 8px;
       cursor: pointer;
       transition: background 0.3s, color 0.3s;
-      flex-shrink: 0;
     }
 
     .toggle-theme:hover {
@@ -72,7 +71,6 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      align-items: center;
     }
 
     input[type="text"] {
@@ -95,8 +93,8 @@
 
     .date-wrapper {
       position: relative;
-      flex-basis: 180px;
-      flex-shrink: 0;
+      flex: 1 1 150px;
+      min-width: 150px;
     }
 
     .date-placeholder {
@@ -105,8 +103,7 @@
       top: 50%;
       transform: translateY(-50%);
       color: #888;
-      pointer-events: auto;
-      cursor: pointer;
+      pointer-events: none;
       font-size: 18px;
       user-select: none;
     }
@@ -119,7 +116,8 @@
       background: var(--input-bg);
       color: var(--text-color);
       transition: border-color 0.3s;
-      width: 180px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     input[type="date"]:focus {
@@ -137,8 +135,8 @@
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s;
-      flex-basis: 120px;
-      flex-shrink: 0;
+      flex: 1 1 150px;
+      min-width: 150px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -182,6 +180,7 @@
       border: 2.5px solid var(--checkbox-border);
       border-radius: 6px;
       position: relative;
+      flex-shrink: 0;
     }
 
     .done .checkbox {
@@ -229,6 +228,9 @@
       cursor: pointer;
       margin-left: 24px;
       user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .delete:hover {
@@ -316,8 +318,14 @@
     }
 
     function addItemToList(text, dateText, done) {
+      const list = document.getElementById("list");
+
       const li = document.createElement("li");
       if (done) li.classList.add("done");
+
+      const leftDiv = document.createElement("div");
+      leftDiv.className = "item-left";
+      leftDiv.addEventListener("click", () => toggleItem(li));
 
       const checkbox = document.createElement("div");
       checkbox.className = "checkbox";
@@ -326,72 +334,65 @@
       itemText.className = "item-text";
       itemText.textContent = text;
 
-      const date = document.createElement("div");
-      date.className = "date";
-      date.textContent = "🗓️ " + dateText;
-
-      const deleteBtn = document.createElement("div");
-      deleteBtn.className = "delete";
-      deleteBtn.textContent = "🗑️";
-
-      const leftDiv = document.createElement("div");
-      leftDiv.className = "item-left";
       leftDiv.appendChild(checkbox);
       leftDiv.appendChild(itemText);
 
-      leftDiv.addEventListener("click", () => toggleItem(li));
+      const dateDiv = document.createElement("div");
+      dateDiv.className = "date";
+      dateDiv.textContent = dateText;
+
+      const deleteBtn = document.createElement("div");
+      deleteBtn.className = "delete";
+      deleteBtn.title = "Slet mål";
+      deleteBtn.textContent = "🗑️";
       deleteBtn.addEventListener("click", () => deleteItem(deleteBtn));
 
       li.appendChild(leftDiv);
-      li.appendChild(date);
+      li.appendChild(dateDiv);
       li.appendChild(deleteBtn);
 
-      document.getElementById("list").appendChild(li);
+      list.appendChild(li);
     }
 
     function updateStats() {
-      const list = document.getElementById("list").children;
-      const total = list.length;
-      let doneCount = 0;
-      for (let li of list) {
-        if (li.classList.contains("done")) doneCount++;
-      }
-      document.getElementById("stats").textContent = `Antal mål: ${total} | Fuldførte: ${doneCount}`;
+      const listItems = document.querySelectorAll("#list li");
+      const total = listItems.length;
+      const done = document.querySelectorAll("#list li.done").length;
+      const stats = document.getElementById("stats");
+      stats.textContent = `Du har ${done} ud af ${total} mål fuldført`;
     }
 
     function toggleTheme() {
       document.body.classList.toggle("dark");
+      saveTheme();
     }
 
-    // Placeholder logik for date input:
-    const dateInput = document.getElementById("deadlineInput");
-    const datePlaceholder = document.getElementById("datePlaceholder");
+    function saveTheme() {
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+
+    function loadTheme() {
+      const theme = localStorage.getItem("theme");
+      if (theme === "dark") document.body.classList.add("dark");
+    }
 
     function toggleDatePlaceholder() {
+      const dateInput = document.getElementById("deadlineInput");
+      const placeholder = document.getElementById("datePlaceholder");
       if (dateInput.value) {
-        datePlaceholder.style.display = "none";
+        placeholder.style.display = "none";
       } else {
-        datePlaceholder.style.display = "block";
+        placeholder.style.display = "block";
       }
     }
 
-    dateInput.addEventListener("input", toggleDatePlaceholder);
-
-    // Gør placeholder klikbar og åben kalenderen
-    datePlaceholder.addEventListener("click", () => {
-      if (dateInput.showPicker) {
-        dateInput.showPicker();
-      } else {
-        dateInput.focus();
-      }
-    });
-
-    // Indlæs listen og opdater stats ved start
-    window.onload = () => {
+    document.getElementById("deadlineInput").addEventListener("input", toggleDatePlaceholder);
+    window.addEventListener("load", () => {
+      loadTheme();
       loadList();
       updateStats();
       toggleDatePlaceholder();
-    };
+    });
   </script>
 </body>
 </html>
