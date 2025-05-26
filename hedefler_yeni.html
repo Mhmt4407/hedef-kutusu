@@ -34,8 +34,6 @@
       color: var(--text-color);
       padding: 30px;
       transition: background 0.3s, color 0.3s;
-      max-width: 800px;
-      margin: 0 auto;
     }
 
     .top-bar {
@@ -53,12 +51,12 @@
 
     .toggle-theme {
       background: none;
-      border: 2px solid var(--text-color);
+      border: 1.5px solid var(--text-color);
       color: var(--text-color);
-      font-size: 18px;
-      font-weight: 700;
-      padding: 8px 16px;
-      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
       cursor: pointer;
       transition: background 0.3s, color 0.3s;
     }
@@ -71,58 +69,41 @@
     .input-area {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 12px;
       margin-bottom: 30px;
+      max-width: 600px;
     }
 
-    input[type="text"] {
-      padding: 20px;
-      font-size: 28px;
-      font-weight: 700;
-      width: 100%;
-      border: 2px solid var(--button-bg);
-      border-radius: 10px;
-      background: var(--input-bg);
-      color: var(--text-color);
-      box-sizing: border-box;
-    }
-
-    input[type="text"]::placeholder {
-      color: #999;
-      font-style: italic;
-    }
-
-    .row {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .date-wrapper,
-    .button-wrapper {
-      flex: 1;
-      min-width: 200px;
-    }
-
-    #deadlineInput {
-      width: 100%;
+    .goal-input {
       padding: 16px;
-      font-size: 18px;
+      font-size: 22px;
+      font-weight: 600;
       border-radius: 8px;
       border: 2px solid var(--button-bg);
       background: var(--input-bg);
       color: var(--text-color);
-      height: 60px;
-      box-sizing: border-box;
+      width: 100%;
     }
 
-    #deadlineInput::placeholder {
-      color: #999;
+    .bottom-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .bottom-row input[type="date"] {
+      flex: 1;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 500;
+      border-radius: 8px;
+      border: 2px solid var(--button-bg);
+      background: var(--input-bg);
+      color: var(--text-color);
+      width: 100%;
     }
 
     button {
-      width: 100%;
-      height: 60px;
+      padding: 14px 20px;
       font-size: 18px;
       font-weight: 700;
       background-color: var(--button-bg);
@@ -130,7 +111,7 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      box-sizing: border-box;
+      transition: background-color 0.3s;
     }
 
     button:hover {
@@ -140,7 +121,6 @@
     ul {
       list-style-type: none;
       padding-left: 0;
-      margin-bottom: 30px;
     }
 
     li {
@@ -240,19 +220,14 @@
   </div>
 
   <div class="input-area">
-    <input type="text" id="newItem" placeholder="Skriv dit mål her..." />
-    <div class="row">
-      <div class="date-wrapper">
-        <input type="date" id="deadlineInput" placeholder="Vælg deadline" />
-      </div>
-      <div class="button-wrapper">
-        <button onclick="addItem()">➕ Tilføj</button>
-      </div>
+    <input type="text" id="newItem" class="goal-input" placeholder="Skriv dit mål her..." />
+    <div class="bottom-row">
+      <input type="date" id="deadlineInput" placeholder="Vælg deadline" />
+      <button onclick="addItem()">➕ Tilføj</button>
     </div>
   </div>
 
   <ul id="list"></ul>
-
   <div class="stats" id="stats"></div>
 
   <script>
@@ -330,10 +305,7 @@
       const del = document.createElement("span");
       del.className = "delete";
       del.innerHTML = "🗑️";
-      del.onclick = (e) => {
-        e.stopPropagation();
-        deleteItem(del);
-      };
+      del.onclick = () => deleteItem(del);
 
       li.appendChild(left);
       li.appendChild(del);
