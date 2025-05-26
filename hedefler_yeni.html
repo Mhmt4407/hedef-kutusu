@@ -80,12 +80,12 @@
       font-weight: 700;
       flex-grow: 1;
       min-width: 300px;
-      height: 56px;
       border: 2px solid var(--button-bg);
       border-radius: 8px;
       background: var(--input-bg);
       color: var(--text-color);
       transition: border-color 0.3s;
+      height: 56px;
     }
 
     input[type="text"]:focus {
@@ -95,7 +95,6 @@
 
     .date-wrapper {
       position: relative;
-      height: 56px;
     }
 
     .date-placeholder {
@@ -109,15 +108,16 @@
     }
 
     input[type="date"] {
-      padding: 14px 12px;
+      height: 56px;
+      padding: 0 12px;
       font-size: 18px;
       border-radius: 8px;
       border: 2px solid var(--button-bg);
       background: var(--input-bg);
       color: var(--text-color);
-      transition: border-color 0.3s;
-      height: 100%;
       box-sizing: border-box;
+      appearance: none;
+      -webkit-appearance: none;
     }
 
     input[type="date"]:focus {
