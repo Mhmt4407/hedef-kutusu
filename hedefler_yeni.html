@@ -34,6 +34,8 @@
       color: var(--text-color);
       padding: 30px;
       transition: background 0.3s, color 0.3s;
+      max-width: 800px;
+      margin: 0 auto;
     }
 
     .top-bar {
@@ -82,7 +84,7 @@
       border-radius: 10px;
       background: var(--input-bg);
       color: var(--text-color);
-      transition: border-color 0.3s;
+      box-sizing: border-box;
     }
 
     input[type="text"]::placeholder {
@@ -90,19 +92,14 @@
       font-style: italic;
     }
 
-    input[type="text"]:focus {
-      outline: none;
-      border-color: var(--button-bg);
-    }
-
     .row {
       display: flex;
       gap: 20px;
-      align-items: stretch;
       flex-wrap: wrap;
     }
 
-    .date-wrapper {
+    .date-wrapper,
+    .button-wrapper {
       flex: 1;
       min-width: 200px;
     }
@@ -115,12 +112,17 @@
       border: 2px solid var(--button-bg);
       background: var(--input-bg);
       color: var(--text-color);
-      box-sizing: border-box;
       height: 60px;
+      box-sizing: border-box;
+    }
+
+    #deadlineInput::placeholder {
+      color: #999;
     }
 
     button {
-      padding: 0 24px;
+      width: 100%;
+      height: 60px;
       font-size: 18px;
       font-weight: 700;
       background-color: var(--button-bg);
@@ -128,10 +130,7 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      box-sizing: border-box;
     }
 
     button:hover {
@@ -244,9 +243,11 @@
     <input type="text" id="newItem" placeholder="Skriv dit mål her..." />
     <div class="row">
       <div class="date-wrapper">
-        <input type="date" id="deadlineInput" />
+        <input type="date" id="deadlineInput" placeholder="Vælg deadline" />
       </div>
-      <button onclick="addItem()">➕ Tilføj</button>
+      <div class="button-wrapper">
+        <button onclick="addItem()">➕ Tilføj</button>
+      </div>
     </div>
   </div>
 
