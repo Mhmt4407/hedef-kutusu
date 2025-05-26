@@ -13,7 +13,6 @@
       --delete-color: red;
       --button-bg: #008000;
       --button-text: white;
-      --input-bg: #ffffff;
     }
 
     body.dark {
@@ -25,7 +24,6 @@
       --delete-color: #ff5555;
       --button-bg: #005500;
       --button-text: #ddffdd;
-      --input-bg: #2a2a2a;
     }
 
     body {
@@ -53,14 +51,12 @@
       background: none;
       border: 2px solid var(--text-color);
       color: var(--text-color);
-      font-size: 16px; /* mindre skrift */
+      font-size: 18px;
       font-weight: 700;
-      padding: 6px 12px; /* mindre padding */
+      padding: 8px 16px;
       border-radius: 8px;
       cursor: pointer;
       transition: background 0.3s, color 0.3s;
-      height: 36px; /* mindre højde */
-      line-height: 1;
     }
 
     .toggle-theme:hover {
@@ -69,23 +65,21 @@
     }
 
     .input-area {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
       margin-bottom: 30px;
-      max-width: 600px;
+      display: flex;
+      align-items: center;
+      width: 100%;
     }
 
     input[type="text"] {
       padding: 14px;
       font-size: 24px;
       font-weight: 700;
-      width: 100%;
+      flex-grow: 1;
       border: 2px solid var(--button-bg);
       border-radius: 8px;
-      background: var(--input-bg);
-      color: var(--text-color);
       transition: border-color 0.3s;
+      box-shadow: 0 0 0 1px var(--button-bg);
     }
 
     input[type="text"]:focus {
@@ -93,45 +87,24 @@
       border-color: var(--button-bg);
     }
 
-    .bottom-row {
-      display: flex;
-      gap: 10px;
-    }
-
-    input[type="date"] {
-      flex: 1;
-      padding: 12px;
-      font-size: 18px;
-      border-radius: 8px;
-      border: 2px solid var(--button-bg);
-      background: var(--input-bg);
-      color: var(--text-color);
-      transition: border-color 0.3s;
-      cursor: pointer;
-    }
-
-    input[type="date"]:focus {
-      outline: none;
-      border-color: var(--button-bg);
-    }
-
-    button.add-btn {
-      flex: 1;
-      padding: 12px 0;
-      font-size: 20px;
+    button {
+      padding: 14px 28px;
+      font-size: 24px;
       font-weight: 700;
       background-color: var(--button-bg);
       color: var(--button-text);
       border: none;
       border-radius: 8px;
+      margin-left: 16px;
       cursor: pointer;
       transition: background-color 0.3s;
+      flex-shrink: 0;
       display: flex;
-      justify-content: center;
       align-items: center;
+      gap: 10px;
     }
 
-    button.add-btn:hover {
+    button:hover {
       background-color: #005500cc;
     }
 
@@ -151,6 +124,7 @@
       border-radius: 8px;
       padding: 14px 20px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: background 0.3s;
     }
 
     .item-left {
@@ -168,6 +142,8 @@
       border: 2.5px solid var(--checkbox-border);
       border-radius: 6px;
       position: relative;
+      transition: border-color 0.3s;
+      flex-shrink: 0;
     }
 
     .done .checkbox {
@@ -183,6 +159,12 @@
       color: white;
       font-size: 22px;
       font-weight: 900;
+      animation: checkFade 0.4s ease forwards;
+    }
+
+    @keyframes checkFade {
+      from {opacity: 0; transform: scale(0.7) rotate(-45deg);}
+      to {opacity: 1; transform: scale(1) rotate(0deg);}
     }
 
     .done .item-text {
@@ -194,19 +176,15 @@
       flex-grow: 1;
       font-weight: 700;
       color: var(--text-color);
+      transition: color 0.3s;
     }
 
     .date {
       font-size: 18px;
       color: #666;
       font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .date::before {
-      content: "🗓️";
+      white-space: nowrap;
+      user-select: none;
     }
 
     .delete {
@@ -215,6 +193,7 @@
       cursor: pointer;
       margin-left: 24px;
       user-select: none;
+      transition: color 0.3s;
     }
 
     .delete:hover {
@@ -238,11 +217,8 @@
   </div>
 
   <div class="input-area">
-    <input type="text" id="newItem" placeholder="Skriv dit mål her..." />
-    <div class="bottom-row">
-      <input type="date" id="deadlineInput" placeholder="Vælg deadline" />
-      <button class="add-btn" onclick="addItem()">➕ Tilføj</button>
-    </div>
+    <input type="text" id="newItem" placeholder="Skriv et nyt mål..." />
+    <button onclick="addItem()">➕ Tilføj</button>
   </div>
 
   <ul id="list"></ul>
@@ -250,12 +226,18 @@
   <div class="stats" id="stats"></div>
 
   <script>
+    function formatDate() {
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      let dateStr = new Date().toLocaleDateString('da-DK', options);
+      return dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+    }
+
     function saveList() {
       const items = [];
       document.querySelectorAll("#list li").forEach(li => {
         items.push({
           text: li.querySelector(".item-text").textContent,
-          date: li.querySelector(".date").textContent.replace("🗓️ ", ""),
+          date: li.querySelector(".date").textContent,
           done: li.classList.contains("done")
         });
       });
@@ -266,6 +248,11 @@
       const saved = localStorage.getItem("goalList");
       if (saved) {
         const items = JSON.parse(saved);
+        items.sort((a,b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return dateA - dateB;
+        });
         items.forEach(item => addItemToList(item.text, item.date, item.done));
       }
     }
@@ -284,17 +271,11 @@
 
     function addItem() {
       const input = document.getElementById("newItem");
-      const dateInput = document.getElementById("deadlineInput");
       const text = input.value.trim();
-      const date = dateInput.value;
-
       if (text === "") return;
-
-      const dateText = date ? new Date(date).toLocaleDateString("da-DK") : "Ingen deadline";
-
-      addItemToList(text, dateText, false);
+      const date = formatDate();
+      addItemToList(text, date, false);
       input.value = "";
-      dateInput.value = "";
       saveList();
       updateStats();
     }
@@ -340,26 +321,10 @@
 
     function toggleTheme() {
       document.body.classList.toggle("dark");
-      saveTheme();
     }
 
-    function saveTheme() {
-      const isDark = document.body.classList.contains("dark");
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-    }
-
-    function loadTheme() {
-      const theme = localStorage.getItem("theme");
-      if (theme === "dark") {
-        document.body.classList.add("dark");
-      }
-    }
-
-    window.onload = () => {
-      loadList();
-      loadTheme();
-      updateStats();
-    };
+    loadList();
+    updateStats();
   </script>
 </body>
 </html>
